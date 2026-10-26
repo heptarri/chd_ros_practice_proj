@@ -9,8 +9,11 @@ publish to an unrelated topic or publish ``TwistStamped``, in which case the
 bridge never forwards the command and the robot does not move.
 
 This launch file starts rqt_robot_steering with a private configuration
-directory that already contains the right settings (``/cmd_vel``, unstamped),
-so the sliders work without touching the user's global rqt configuration.
+directory that already contains the right settings (``/cmd_vel``, unstamped,
+10 m/s / 2 rad/s slider range), so the controls work without touching the
+user's global rqt configuration.  It uses the small wrapper in
+``scripts/rqt_robot_steering_guardrail`` to work around a float/int bug in
+rqt_robot_steering 1.0.3 that otherwise keeps the sliders pinned to +/-1 m/s.
 
 Usage:
     ros2 launch guardrail_robot teleop.launch.py
@@ -45,8 +48,8 @@ def generate_launch_description() -> LaunchDescription:
             # Only affects the processes started by this launch description.
             SetEnvironmentVariable("XDG_CONFIG_HOME", config_home),
             Node(
-                package="rqt_robot_steering",
-                executable="rqt_robot_steering",
+                package="guardrail_robot",
+                executable="rqt_robot_steering_guardrail",
                 output="screen",
             ),
         ]

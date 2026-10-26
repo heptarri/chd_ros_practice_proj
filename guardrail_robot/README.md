@@ -2,6 +2,24 @@
 
 ROS 2 Humble + Gazebo（Fortress / ignition-gazebo6）中的护栏巡检小车仿真。
 
+## 尺寸
+
+小车按真实中型乘用车/高速公路巡检车尺寸建模，公路按实际两车道高速断面建模：
+
+| 项目 | 数值 |
+| --- | --- |
+| 车体（长 × 宽 × 高） | 4.70 m × 1.85 m × 1.50 m |
+| 总高（含车顶设备/激光雷达） | 约 1.74 m |
+| 轴距 / 轮距 | 2.80 m / 1.58 m |
+| 车轮直径 / 宽度 | 0.68 m / 0.24 m |
+| 离地间隙（底板） | 0.28 m |
+| 整备质量 | 约 1600 kg |
+| 相机 / 激光雷达离地高度 | 0.80 m / 1.70 m |
+| 车道宽 | 3.75 m |
+| 右侧硬路肩 | 2.50 m |
+| 中央虚线 | 6 m 线段 + 9 m 间隔 |
+| 护栏梁高 / 立柱间距 | 0.31 m / 4 m |
+
 ## 编译
 
 ```bash
@@ -33,8 +51,9 @@ ros2 launch guardrail_robot sim.launch.py rviz:=false teleop:=false
 ## 用 rqt_robot_steering 遥控
 
 `sim.launch.py` 已经启动了一个配置好的 `rqt_robot_steering` 窗口，直接拖动
-**Linear x**（前进/后退）和 **Angular z**（左转/右转）滑块即可，松开滑块前
-小车会持续按当前速度行驶，把滑块拖回 0 或点击 **Stop** 停车。
+**Linear x**（前进/后退）和 **Angular z**（左转/右转）滑块即可。前进速度
+范围 0–10 m/s（36 km/h），倒车 0–4 m/s，转向 ±2 rad/s。松开滑块前小车会
+持续按当前速度行驶，把滑块拖回 0 或点击 **Stop** 停车。
 
 也可以单独启动遥控窗口（仿真已经在运行时）：
 
@@ -56,13 +75,27 @@ Gazebo 的 DiffDrive 插件订阅 `/cmd_vel`，消息类型是
 `topic=/cmd_vel`、`stamped=false` 的配置（`config/rqt_robot_steering.ini`），
 因此不会受全局 rqt 配置影响。
 
-如果不想通过 launch 文件启动，也可以直接运行：
+同时它使用 `scripts/rqt_robot_steering_guardrail` 启动 rqt：
+rqt_robot_steering 1.0.3 在 PyQt5 下把浮点数传给 `QSlider.setMaximum()`，
+会抛 `TypeError`，导致速度上限设置失效、滑块始终只有 ±1 m/s。包装脚本把
+该值转成整数，滑块才能使用 0–10 m/s 的速度范围。
+
+如果不想通过 launch 文件启动，也可以直接运行包装脚本：
 
 ```bash
-ros2 run rqt_robot_steering rqt_robot_steering
+ros2 run guardrail_robot rqt_robot_steering_guardrail
 ```
 
+注意：直接运行系统自带的 `ros2 run rqt_robot_steering rqt_robot_steering`
+时，受上述 bug 影响滑块最大仍只有 ±1 m/s，车子会显得很慢。
+
 然后确认窗口中的 **Topic** 为 `/cmd_vel`，并**取消勾选 stamped**。
+
+### 速度参数
+
+* Gazebo 侧上限：`urdf/gazebo.xacro` 中的 `max_linear_velocity`
+  （当前 10 m/s）、`max_linear_acceleration`（3 m/s²）。
+* rqt 滑块范围：`config/rqt_robot_steering.ini` 中的 `vx_max` / `vx_min`。
 
 ## 话题说明
 
@@ -70,22 +103,91 @@ ros2 run rqt_robot_steering rqt_robot_steering
 | --- | --- | --- |
 | 控制输入 | `/cmd_vel` | `geometry_msgs/msg/Twist` |
 | 里程计 | `/odom` | `nav_msgs/msg/Odometry` |
-| 激光雷达 | `/scan` | `sensor_msgs/msg/LaserScan` |
+| 激光雷达（单线扫描） | `/scan` | `sensor_msgs/msg/LaserScan` |
+| 激光雷达（三维点云） | `/scan/points` | `sensor_msgs/msg/PointCloud2` |
 | 相机 | `/camera/image_raw` | `sensor_msgs/msg/Image` |
 | IMU | `/imu` | `sensor_msgs/msg/Imu` |
 
 ## 常见问题
 
-* **小车没有生成 / 没有 `/odom`**：之前异常退出的 Gazebo 进程可能还占用着
-  仿真服务，先清理再启动：
+### RViz 反复提示 `Detected jump back in time`，点云/模型不显示
+
+这是**时间戳冲突**，不是点云话题的问题。通常是因为同时（或之前残留）运行了
+多个 Gazebo / bridge / robot_state_publisher 进程：多个 `/clock`、
+`/joint_states`、`/tf` 发布者带着不同的仿真时间交错到达，RViz 会不停
+`Resetting RViz`，画面自然什么都渲染不出来。
+
+注意不要用 `kill -9` 只杀 `ros2 launch`，否则它的子进程会变成孤儿进程继续
+运行。正确的清理方式是：
+
+```bash
+# 先正常关闭 launch，它会带着子进程一起退出
+pkill -INT -f "ros2 launch guardrail_robot"
+
+# 如果还有残留（例如上次被 kill -9 过），再逐个清理
+pkill -f "ign gazebo"
+pkill -f "parameter_bridge"
+pkill -f "robot_state_publisher"
+pkill -f "rviz2"
+pkill -f "rqt_robot_steering"
+```
+
+然后只启动**一份**仿真：
+
+```bash
+ros2 launch guardrail_robot sim.launch.py
+```
+
+确认时钟只有一个发布者，且日志里没有 `jump back in time`：
+
+```bash
+ros2 topic info /clock -v
+```
+
+### RViz 中看不到点云
+
+* 点云话题是 `/scan/points`（`sensor_msgs/msg/PointCloud2`），不是 `/scan`
+  （`/scan` 是同一次扫描的单线 `LaserScan`）。
+* 使用本包的 `rviz/guardrail.rviz` 时，Displays 中已经有一个
+  **LiDAR Points** 显示，话题为 `/scan/points`，确认它是勾选状态。
+* 如果用的是自己新建的 RViz：添加 **PointCloud2** display，Topic 选
+  `/scan/points`，Fixed Frame 选 `odom`。
+* 先确认话题真的有数据：
 
   ```bash
-  pkill -f "ign gazebo"
+  ros2 topic hz /scan/points
   ```
 
-* **滑块动了但小车不动**：检查 `/cmd_vel` 的发布者类型是否为
-  `geometry_msgs/msg/Twist`：
+  正常大约 7–10 Hz。
 
-  ```bash
-  ros2 topic info /cmd_vel -v
-  ```
+### 小车没有生成 / 没有 `/odom`
+
+之前异常退出的 Gazebo 进程可能还占用着仿真服务，按上面的清理步骤处理后再
+启动。
+
+### 滑块动了但小车不动
+
+检查 `/cmd_vel` 的发布者类型是否为 `geometry_msgs/msg/Twist`：
+
+```bash
+ros2 topic info /cmd_vel -v
+```
+
+### 转弯不灵 / 原地转不动
+
+四轮差速转向靠轮胎横向搓地完成转向，横向摩擦不能和纵向抓地一样大。
+本包在 `urdf/wheels.xacro` 中设置了：
+
+* `mu1`（纵向抓地）= 1.5
+* `mu2`（横向搓地）= 0.2
+* 轮端力矩上限 = 1500 Nm
+
+另外有一个容易踩的坑：sdformat 的 URDF 解析器只有在 **collision 名称以 link
+名称开头**（或为空）时，才会应用 `<gazebo reference>` 里的
+`mu1` / `mu2` / `fdir1` / `kp` / `kd`。如果以后修改 collision 名字，请保留
+`front_left_wheel_link_...` 这种前缀；否则摩擦参数会被静默忽略，车轮又回到
+默认摩擦，转向会非常迟钝。
+
+如果还想更灵敏，可以调大 `urdf/gazebo.xacro` 中的
+`max_angular_velocity` / `max_angular_acceleration`，以及
+`config/rqt_robot_steering.ini` 中的 `vw_max` / `vw_min`。

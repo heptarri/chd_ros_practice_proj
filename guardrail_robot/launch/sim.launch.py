@@ -62,9 +62,11 @@ def generate_launch_description() -> LaunchDescription:
         arguments=[
             "-name", "guardrail_bot",
             "-topic", "robot_description",
+            # base_footprint is the wheel-contact plane.  The right-hand lane
+            # centre is y=-1.875 m and the asphalt top is z=0.02 m.
             "-x", "0.0",
-            "-y", "-1.85",
-            "-z", "0.10",
+            "-y", "-1.875",
+            "-z", "0.03",
             "-R", "0.0",
             "-P", "0.0",
             "-Y", "0.0",

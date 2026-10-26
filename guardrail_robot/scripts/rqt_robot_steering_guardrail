@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Start rqt_robot_steering with working speed-limit spin boxes.
+
+rqt_robot_steering 1.0.3 computes the QSlider limits as floats::
+
+    self._widget.x_linear_slider.setMaximum(value * RobotSteering.slider_factor)
+
+Under PyQt5 ``QSlider.setMaximum`` only accepts an int, so the four
+limit callbacks raise ``TypeError`` and the values restored from
+``rqt_gui.ini`` are ignored.  The sliders then stay at their UI defaults
+(+/-1 m/s and +/-3 rad/s), which is far too slow for a car-sized vehicle.
+
+This wrapper patches the four callbacks to round the value to an int before
+setting the slider range, then starts the normal rqt robot-steering plugin.
+The speed limits themselves still come from config/rqt_robot_steering.ini.
+"""
+
+import sys
+
+from rqt_gui.main import Main
+from rqt_robot_steering.robot_steering import RobotSteering
+
+
+def _limit_handler(slider_name, setter_name):
+    """Return a callback that sets an integer QSlider limit."""
+    def handler(self, value):
+        slider = getattr(self._widget, slider_name)
+        limit = int(round(float(value) * self.slider_factor))
+        getattr(slider, setter_name)(limit)
+    return handler
+
+
+RobotSteering._on_max_x_linear_changed = _limit_handler(
+    "x_linear_slider", "setMaximum")
+RobotSteering._on_min_x_linear_changed = _limit_handler(
+    "x_linear_slider", "setMinimum")
+RobotSteering._on_max_z_angular_changed = _limit_handler(
+    "z_angular_slider", "setMaximum")
+RobotSteering._on_min_z_angular_changed = _limit_handler(
+    "z_angular_slider", "setMinimum")
+
+
+def main():
+    sys.exit(Main().main(
+        sys.argv,
+        standalone="rqt_robot_steering.robot_steering.RobotSteering",
+    ))
+
+
+if __name__ == "__main__":
+    main()

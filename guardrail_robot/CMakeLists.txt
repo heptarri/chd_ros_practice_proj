@@ -13,6 +13,7 @@ install(DIRECTORY
 )
 
 install(PROGRAMS
+  scripts/rqt_robot_steering_guardrail
   DESTINATION lib/${PROJECT_NAME}
 )
 

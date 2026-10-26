@@ -31,16 +31,17 @@
       <child_frame_id>base_footprint</child_frame_id>
       <odom_publish_frequency>50</odom_publish_frequency>
 
-      <!-- Speed and acceleration limits make the simulated vehicle
-           behave like a small inspection robot, not a racing car. -->
-      <min_linear_velocity>-1.0</min_linear_velocity>
-      <max_linear_velocity>1.5</max_linear_velocity>
+      <!-- Road-inspection vehicle limits: up to 10 m/s (36 km/h) and
+           3 m/s^2 acceleration, i.e. quick enough to drive normally on
+           the 120 m highway section while staying controllable. -->
+      <min_linear_velocity>-4.0</min_linear_velocity>
+      <max_linear_velocity>10.0</max_linear_velocity>
       <min_angular_velocity>-2.0</min_angular_velocity>
       <max_angular_velocity>2.0</max_angular_velocity>
-      <min_linear_acceleration>-1.0</min_linear_acceleration>
-      <max_linear_acceleration>1.0</max_linear_acceleration>
-      <min_angular_acceleration>-2.0</min_angular_acceleration>
-      <max_angular_acceleration>2.0</max_angular_acceleration>
+      <min_linear_acceleration>-5.0</min_linear_acceleration>
+      <max_linear_acceleration>3.0</max_linear_acceleration>
+      <min_angular_acceleration>-3.0</min_angular_acceleration>
+      <max_angular_acceleration>3.0</max_angular_acceleration>
     </plugin>
 
     <!-- Publishes /joint_states as gz.msgs.Model; bridge it to

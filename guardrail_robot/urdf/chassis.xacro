@@ -22,22 +22,43 @@
       </material>
     </visual>
 
-    <!-- Lower skirt: makes the robot look like a road-inspection platform. -->
-    <visual name="skirt_visual">
-      <origin xyz="0 0 -0.09" rpy="0 0 0"/>
+    <!-- Cabin above the main body: 4.70 m car, 1.50 m total height. -->
+    <visual name="cabin_visual">
+      <origin xyz="-0.15 0 0.55" rpy="0 0 0"/>
       <geometry>
-        <box size="0.58 0.40 0.04"/>
+        <box size="2.20 1.70 0.35"/>
       </geometry>
       <material name="body_dark">
         <color rgba="0.11 0.12 0.13 1.0"/>
       </material>
     </visual>
 
-    <!-- Front camera housing and rear equipment box are only decorative. -->
-    <visual name="front_panel_visual">
-      <origin xyz="0.305 0 0.01" rpy="0 0 0"/>
+    <!-- Lower floor pan, narrower than the track so the wheels stay visible. -->
+    <visual name="skirt_visual">
+      <origin xyz="0 0 -0.42" rpy="0 0 0"/>
       <geometry>
-        <box size="0.025 0.20 0.10"/>
+        <box size="4.30 1.30 0.15"/>
+      </geometry>
+      <material name="body_dark">
+        <color rgba="0.11 0.12 0.13 1.0"/>
+      </material>
+    </visual>
+
+    <!-- Front grille / bumper and rear roof equipment box are decorative. -->
+    <visual name="front_panel_visual">
+      <origin xyz="2.34 0 -0.20" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.06 1.50 0.30"/>
+      </geometry>
+      <material name="panel_grey">
+        <color rgba="0.20 0.22 0.24 1.0"/>
+      </material>
+    </visual>
+
+    <visual name="rear_box_visual">
+      <origin xyz="-0.90 0 0.835" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.70 1.20 0.22"/>
       </geometry>
       <material name="panel_grey">
         <color rgba="0.20 0.22 0.24 1.0"/>
@@ -51,10 +72,18 @@
       </geometry>
     </collision>
 
+    <collision name="cabin_collision">
+      <origin xyz="-0.15 0 0.55" rpy="0 0 0"/>
+      <geometry>
+        <box size="2.20 1.70 0.35"/>
+      </geometry>
+    </collision>
+
+    <!-- Effective height includes the cabin and roof equipment. -->
     <xacro:box_inertial mass="${chassis_mass}"
                         x="${chassis_length}"
                         y="${chassis_width}"
-                        z="${chassis_height}"/>
+                        z="1.30"/>
   </link>
 
   <!-- A fixed frame at the front face, convenient for future sensors. -->
@@ -62,7 +91,7 @@
   <joint name="front_frame_joint" type="fixed">
     <parent link="base_link"/>
     <child link="front_frame"/>
-    <origin xyz="0.31 0 0.02" rpy="0 0 0"/>
+    <origin xyz="2.36 0 -0.20" rpy="0 0 0"/>
   </joint>
 
 </robot>

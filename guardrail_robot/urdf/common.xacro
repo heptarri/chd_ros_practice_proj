@@ -3,34 +3,42 @@
 
   <!-- ============================================================
        Geometric and dynamic parameters (SI units: m, kg, s, rad)
-       ============================================================ -->
-  <xacro:property name="wheel_radius"     value="0.10"/>
-  <xacro:property name="wheel_width"      value="0.06"/>
-  <xacro:property name="wheel_mass"       value="0.70"/>
 
-  <!-- Wheel centres relative to base_link -->
-  <xacro:property name="wheel_x"          value="0.22"/>
-  <xacro:property name="wheel_y"          value="0.235"/>
-  <xacro:property name="wheel_z"          value="-0.14"/>
+       Real-world reference: a mid-size highway inspection car.
+       4.70 m long, 1.85 m wide, 1.50 m tall, 2.80 m wheelbase,
+       0.68 m diameter wheels.  This is proportionate to the 3.75 m
+       highway lanes in worlds/highway.sdf.
+       ============================================================ -->
+  <xacro:property name="wheel_radius"     value="0.34"/>
+  <xacro:property name="wheel_width"      value="0.24"/>
+  <xacro:property name="wheel_mass"       value="25.0"/>
+
+  <!-- Wheel centres relative to base_link.
+       wheel_z keeps the wheel contact patch on the base_footprint plane:
+       base_link_z + wheel_z = wheel_radius. -->
+  <xacro:property name="wheel_x"          value="1.40"/>
+  <xacro:property name="wheel_y"          value="0.79"/>
+  <xacro:property name="wheel_z"          value="-0.435"/>
 
   <!-- Track width used by the diff-drive plugin (left/right wheel centres) -->
   <xacro:property name="wheel_separation" value="${2.0 * wheel_y}"/>
 
-  <!-- Chassis -->
-  <xacro:property name="chassis_length"   value="0.62"/>
-  <xacro:property name="chassis_width"    value="0.44"/>
-  <xacro:property name="chassis_height"   value="0.18"/>
-  <xacro:property name="chassis_mass"     value="8.0"/>
-  <xacro:property name="base_link_z"      value="0.24"/>
+  <!-- Body: 4.70 x 1.85 x 0.75 m (cabin adds another 0.35 m), 0.28 m
+       ground clearance under the floor pan. -->
+  <xacro:property name="chassis_length"   value="4.70"/>
+  <xacro:property name="chassis_width"    value="1.85"/>
+  <xacro:property name="chassis_height"   value="0.75"/>
+  <xacro:property name="chassis_mass"     value="1500.0"/>
+  <xacro:property name="base_link_z"      value="0.775"/>
 
   <!-- Sensor mounting (relative to base_link) -->
-  <xacro:property name="camera_x"         value="0.335"/>
+  <xacro:property name="camera_x"         value="2.36"/>
   <xacro:property name="camera_y"         value="0.0"/>
-  <xacro:property name="camera_z"         value="0.16"/>
+  <xacro:property name="camera_z"         value="0.025"/>
 
   <xacro:property name="lidar_x"          value="0.0"/>
   <xacro:property name="lidar_y"          value="0.0"/>
-  <xacro:property name="lidar_z"          value="0.22"/>
+  <xacro:property name="lidar_z"          value="0.925"/>
 
   <!-- ============================================================
        Inertia helpers.  All links are modelled as primitive shapes,

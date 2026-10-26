@@ -6,7 +6,7 @@
     <visual name="camera_body_visual">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.050 0.090 0.055"/>
+        <box size="0.075 0.135 0.080"/>
       </geometry>
       <material name="sensor_dark">
         <color rgba="0.08 0.09 0.10 1.0"/>
@@ -14,9 +14,9 @@
     </visual>
 
     <visual name="camera_lens_visual">
-      <origin xyz="0.028 0 0" rpy="0 1.5708 0"/>
+      <origin xyz="0.042 0 0" rpy="0 1.5708 0"/>
       <geometry>
-        <cylinder radius="0.018" length="0.012"/>
+        <cylinder radius="0.027" length="0.018"/>
       </geometry>
       <material name="lens_blue">
         <color rgba="0.05 0.18 0.35 1.0"/>
@@ -25,9 +25,9 @@
 
     <!-- Small bracket down to the chassis front face. -->
     <visual name="camera_bracket_visual">
-      <origin xyz="-0.020 0 -0.045" rpy="0 0 0"/>
+      <origin xyz="-0.020 0 -0.060" rpy="0 0 0"/>
       <geometry>
-        <box size="0.030 0.040 0.090"/>
+        <box size="0.040 0.060 0.120"/>
       </geometry>
       <material name="panel_grey">
         <color rgba="0.20 0.22 0.24 1.0"/>
@@ -37,11 +37,11 @@
     <collision name="camera_collision">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.050 0.090 0.055"/>
+        <box size="0.075 0.135 0.080"/>
       </geometry>
     </collision>
 
-    <xacro:box_inertial mass="0.15" x="0.050" y="0.090" z="0.055"/>
+    <xacro:box_inertial mass="0.30" x="0.075" y="0.135" z="0.080"/>
   </link>
 
   <joint name="camera_joint" type="fixed">
@@ -86,9 +86,9 @@
   <link name="lidar_link">
     <!-- Mounting mast -->
     <visual name="lidar_mast_visual">
-      <origin xyz="0 0 -0.055" rpy="0 0 0"/>
+      <origin xyz="0 0 -0.100" rpy="0 0 0"/>
       <geometry>
-        <cylinder radius="0.022" length="0.110"/>
+        <cylinder radius="0.030" length="0.200"/>
       </geometry>
       <material name="panel_grey">
         <color rgba="0.20 0.22 0.24 1.0"/>
@@ -122,7 +122,7 @@
       </geometry>
     </collision>
 
-    <xacro:cylinder_inertial mass="0.25" radius="0.055" length="0.060"/>
+    <xacro:cylinder_inertial mass="0.80" radius="0.055" length="0.060"/>
   </link>
 
   <joint name="lidar_joint" type="fixed">
@@ -146,7 +146,7 @@
       <!-- Place the optical centre slightly in front of the decorative lens.
            Otherwise the lens/body can clip into the camera's near plane and
            fill the whole image with its own housing. -->
-      <pose>0.06 0 0 0 0 0</pose>
+      <pose>0.09 0 0 0 0 0</pose>
       <camera>
         <horizontal_fov>1.396263</horizontal_fov>
         <image>
