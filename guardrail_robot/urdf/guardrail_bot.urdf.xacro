@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<robot name="guardrail_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Camera mounting.  The defaults keep the camera level for the guardrail
+       inspection demo.  The line-following launch file overrides these
+       values with camera_pitch:=0.45 camera_yaw:=0.0 to look down at the
+       road marking. -->
+  <xacro:arg name="camera_pitch" default="0.0"/>
+  <xacro:arg name="camera_yaw" default="-0.08"/>
+
+  <xacro:include filename="common.xacro"/>
+  <xacro:include filename="chassis.xacro"/>
+  <xacro:include filename="wheels.xacro"/>
+  <xacro:include filename="sensors.xacro"/>
+  <xacro:include filename="gazebo.xacro"/>
+
+</robot>

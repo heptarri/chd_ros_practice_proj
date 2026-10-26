@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ============================================================
+       Geometric and dynamic parameters (SI units: m, kg, s, rad)
+       ============================================================ -->
+  <xacro:property name="wheel_radius"     value="0.10"/>
+  <xacro:property name="wheel_width"      value="0.06"/>
+  <xacro:property name="wheel_mass"       value="0.70"/>
+
+  <!-- Wheel centres relative to base_link -->
+  <xacro:property name="wheel_x"          value="0.22"/>
+  <xacro:property name="wheel_y"          value="0.235"/>
+  <xacro:property name="wheel_z"          value="-0.14"/>
+
+  <!-- Track width used by the diff-drive plugin (left/right wheel centres) -->
+  <xacro:property name="wheel_separation" value="${2.0 * wheel_y}"/>
+
+  <!-- Chassis -->
+  <xacro:property name="chassis_length"   value="0.62"/>
+  <xacro:property name="chassis_width"    value="0.44"/>
+  <xacro:property name="chassis_height"   value="0.18"/>
+  <xacro:property name="chassis_mass"     value="8.0"/>
+  <xacro:property name="base_link_z"      value="0.24"/>
+
+  <!-- Sensor mounting (relative to base_link) -->
+  <xacro:property name="camera_x"         value="0.335"/>
+  <xacro:property name="camera_y"         value="0.0"/>
+  <xacro:property name="camera_z"         value="0.16"/>
+
+  <xacro:property name="lidar_x"          value="0.0"/>
+  <xacro:property name="lidar_y"          value="0.0"/>
+  <xacro:property name="lidar_z"          value="0.22"/>
+
+  <!-- ============================================================
+       Inertia helpers.  All links are modelled as primitive shapes,
+       so their inertia can be generated from mass + dimensions.
+       ============================================================ -->
+  <xacro:macro name="box_inertial" params="mass x y z">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${mass * (y*y + z*z) / 12.0}" ixy="0.0" ixz="0.0"
+        iyy="${mass * (x*x + z*z) / 12.0}" iyz="0.0"
+        izz="${mass * (x*x + y*y) / 12.0}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="cylinder_inertial" params="mass radius length">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${mass * (3.0*radius*radius + length*length) / 12.0}" ixy="0.0" ixz="0.0"
+        iyy="${mass * (3.0*radius*radius + length*length) / 12.0}" iyz="0.0"
+        izz="${mass * radius * radius / 2.0}"/>
+    </inertial>
+  </xacro:macro>
+
+</robot>

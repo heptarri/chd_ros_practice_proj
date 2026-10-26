@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- base_footprint is the ground-projection frame used by odometry.
+       It is massless; Gazebo will lump the fixed joint into base_link. -->
+  <link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${base_link_z}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <visual name="chassis_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+      <material name="body_orange">
+        <color rgba="0.95 0.45 0.08 1.0"/>
+      </material>
+    </visual>
+
+    <!-- Lower skirt: makes the robot look like a road-inspection platform. -->
+    <visual name="skirt_visual">
+      <origin xyz="0 0 -0.09" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.58 0.40 0.04"/>
+      </geometry>
+      <material name="body_dark">
+        <color rgba="0.11 0.12 0.13 1.0"/>
+      </material>
+    </visual>
+
+    <!-- Front camera housing and rear equipment box are only decorative. -->
+    <visual name="front_panel_visual">
+      <origin xyz="0.305 0 0.01" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.025 0.20 0.10"/>
+      </geometry>
+      <material name="panel_grey">
+        <color rgba="0.20 0.22 0.24 1.0"/>
+      </material>
+    </visual>
+
+    <collision name="chassis_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+
+    <xacro:box_inertial mass="${chassis_mass}"
+                        x="${chassis_length}"
+                        y="${chassis_width}"
+                        z="${chassis_height}"/>
+  </link>
+
+  <!-- A fixed frame at the front face, convenient for future sensors. -->
+  <link name="front_frame"/>
+  <joint name="front_frame_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_frame"/>
+    <origin xyz="0.31 0 0.02" rpy="0 0 0"/>
+  </joint>
+
+</robot>

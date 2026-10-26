@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ==================== Camera ==================== -->
+  <link name="camera_link">
+    <visual name="camera_body_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.090 0.055"/>
+      </geometry>
+      <material name="sensor_dark">
+        <color rgba="0.08 0.09 0.10 1.0"/>
+      </material>
+    </visual>
+
+    <visual name="camera_lens_visual">
+      <origin xyz="0.028 0 0" rpy="0 1.5708 0"/>
+      <geometry>
+        <cylinder radius="0.018" length="0.012"/>
+      </geometry>
+      <material name="lens_blue">
+        <color rgba="0.05 0.18 0.35 1.0"/>
+      </material>
+    </visual>
+
+    <!-- Small bracket down to the chassis front face. -->
+    <visual name="camera_bracket_visual">
+      <origin xyz="-0.020 0 -0.045" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.030 0.040 0.090"/>
+      </geometry>
+      <material name="panel_grey">
+        <color rgba="0.20 0.22 0.24 1.0"/>
+      </material>
+    </visual>
+
+    <collision name="camera_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.090 0.055"/>
+      </geometry>
+    </collision>
+
+    <xacro:box_inertial mass="0.15" x="0.050" y="0.090" z="0.055"/>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${camera_x} ${camera_y} ${camera_z}"
+            rpy="0 $(arg camera_pitch) $(arg camera_yaw)"/>
+  </joint>
+
+  <!-- ==================== IMU ==================== -->
+  <!-- A small IMU used by the U-turn behaviour.  Wheel odometry is accurate
+       while driving straight but yaw drifts during a skid-steer turn, so the
+       controller uses the IMU heading for the 180 degree return manoeuvre. -->
+  <link name="imu_link">
+    <visual name="imu_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.035 0.035 0.012"/></geometry>
+      <material name="imu_dark">
+        <color rgba="0.06 0.07 0.08 1.0"/>
+      </material>
+    </visual>
+    <xacro:box_inertial mass="0.02" x="0.035" y="0.035" z="0.012"/>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- REP-103 optical frame: z forward, x right, y down.
+       The Gazebo camera sensor itself is attached to camera_link and looks
+       along camera_link +x; this extra frame is for image/point projection. -->
+  <link name="camera_optical_link"/>
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_optical_link"/>
+    <origin xyz="0 0 0" rpy="-1.5707963 0 -1.5707963"/>
+  </joint>
+
+  <!-- ==================== 3D LiDAR ==================== -->
+  <link name="lidar_link">
+    <!-- Mounting mast -->
+    <visual name="lidar_mast_visual">
+      <origin xyz="0 0 -0.055" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.022" length="0.110"/>
+      </geometry>
+      <material name="panel_grey">
+        <color rgba="0.20 0.22 0.24 1.0"/>
+      </material>
+    </visual>
+
+    <visual name="lidar_body_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.055" length="0.060"/>
+      </geometry>
+      <material name="sensor_dark">
+        <color rgba="0.08 0.09 0.10 1.0"/>
+      </material>
+    </visual>
+
+    <visual name="lidar_cap_visual">
+      <origin xyz="0 0 0.034" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.043" length="0.010"/>
+      </geometry>
+      <material name="rim_silver">
+        <color rgba="0.75 0.76 0.78 1.0"/>
+      </material>
+    </visual>
+
+    <collision name="lidar_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.055" length="0.060"/>
+      </geometry>
+    </collision>
+
+    <xacro:cylinder_inertial mass="0.25" radius="0.055" length="0.060"/>
+  </link>
+
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ============================================================
+       Gazebo sensor definitions.  They live inside <gazebo
+       reference="..."> so that the URDF -> SDF converter attaches
+       each sensor to the correct link.
+       ============================================================ -->
+  <gazebo reference="camera_link">
+    <sensor name="front_camera" type="camera">
+      <always_on>true</always_on>
+      <update_rate>10</update_rate>
+      <visualize>true</visualize>
+      <topic>camera/image_raw</topic>
+      <ignition_frame_id>camera_link</ignition_frame_id>
+      <!-- Place the optical centre slightly in front of the decorative lens.
+           Otherwise the lens/body can clip into the camera's near plane and
+           fill the whole image with its own housing. -->
+      <pose>0.06 0 0 0 0 0</pose>
+      <camera>
+        <horizontal_fov>1.396263</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>100.0</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>false</visualize>
+      <topic>imu</topic>
+      <ignition_frame_id>imu_link</ignition_frame_id>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="lidar_link">
+    <sensor name="lidar3d" type="gpu_lidar">
+      <always_on>true</always_on>
+      <update_rate>10</update_rate>
+      <visualize>true</visualize>
+      <topic>scan</topic>
+      <ignition_frame_id>lidar_link</ignition_frame_id>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159265</min_angle>
+            <max_angle>3.14159265</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>16</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.261799</min_angle>
+            <max_angle>0.261799</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.15</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </ray>
+    </sensor>
+  </gazebo>
+
+</robot>
