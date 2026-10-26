@@ -175,20 +175,24 @@
   <gazebo reference="lidar_link">
     <sensor name="lidar3d" type="gpu_lidar">
       <always_on>true</always_on>
-      <update_rate>10</update_rate>
+      <!-- 1440 x 64 = 92,160 points per frame.  The 5 Hz update keeps the
+           number of rays per second the same as 1440 x 32 at 10 Hz. -->
+      <update_rate>5</update_rate>
       <visualize>true</visualize>
       <topic>scan</topic>
       <ignition_frame_id>lidar_link</ignition_frame_id>
       <ray>
         <scan>
+          <!-- 1440 x 64 = 92,160 points per frame.  Raise/lower these two
+               numbers to tune density. -->
           <horizontal>
-            <samples>720</samples>
+            <samples>1440</samples>
             <resolution>1</resolution>
             <min_angle>-3.14159265</min_angle>
             <max_angle>3.14159265</max_angle>
           </horizontal>
           <vertical>
-            <samples>16</samples>
+            <samples>64</samples>
             <resolution>1</resolution>
             <min_angle>-0.261799</min_angle>
             <max_angle>0.261799</max_angle>
