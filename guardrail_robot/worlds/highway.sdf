@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <!--
-  highway.sdf — 120 m two-lane highway section for guardrail inspection.
+  highway.sdf — 120 m two-lane highway with a left-hand bend.
 
-  The cross-section follows a realistic highway:
+  The centreline is a circular arc of radius 120 m over about 57 degrees
+  (120 m arc length).  Cross-section follows a realistic highway:
     * two 3.75 m lanes (7.50 m carriageway)
     * 2.50 m right-hand hard shoulder
     * 0.15 m edge lines, 6 m dash / 9 m gap centre line
@@ -10,8 +11,9 @@
       0.31 m beam, top at 0.755 m, posts every 4 m
 
   Axes: +x forward, +y left, +z up.
-  Right-hand lane centre: y = -1.875.
-  Normal rail: x in [-8,30] and [38,100], y=-6.15.
+  Arc: centre at (0, 120), road starts at the origin heading +x.
+  Right-hand lane centre at the start: (0, -1.875), heading +x.
+  Normal rail: arc length [-8,30] and [38,100], y=-6.15.
   Damage: [30,34] missing rail/post; [34,38] bent rail; debris and drums.
 -->
 <sdf version="1.8">
@@ -58,7 +60,7 @@
 
         <visual name="grass">
           <pose>0 0 -0.03 0 0 0</pose>
-          <geometry><plane><normal>0 0 1</normal><size>240 160</size></plane></geometry>
+          <geometry><plane><normal>0 0 1</normal><size>260 200</size></plane></geometry>
           <material>
             <ambient>0.06 0.12 0.04 1</ambient>
             <diffuse>0.12 0.25 0.08 1</diffuse>
@@ -66,48 +68,278 @@
         </visual>
         <collision name="grass_collision">
           <pose>0 0 -0.03 0 0 0</pose>
-          <geometry><plane><normal>0 0 1</normal><size>240 160</size></plane></geometry>
+          <geometry><plane><normal>0 0 1</normal><size>260 200</size></plane></geometry>
           <surface><friction><ode><mu>0.9</mu><mu2>0.9</mu2></ode></friction></surface>
         </collision>
 
-        <!-- Paved carriageway (2 x 3.75 m) plus the 2.50 m hard shoulder. -->
-        <visual name="asphalt">
-          <pose>50 -1.25 0 0 0 0</pose>
-          <geometry><box><size>120 10.0 0.04</size></box></geometry>
-          <material>
-            <ambient>0.055 0.058 0.062 1</ambient>
-            <diffuse>0.16 0.17 0.18 1</diffuse>
-          </material>
-        </visual>
-        <collision name="asphalt_collision">
-          <pose>50 -1.25 0 0 0 0</pose>
-          <geometry><box><size>120 10.0 0.04</size></box></geometry>
-          <surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface>
-        </collision>
+        <!-- Paved carriageway (2 x 3.75 m) plus the 2.50 m right-hand
+             hard shoulder, split into short chords along the bend. -->
+        <visual name="asphalt_0"><pose>-9.085227 -0.909144 0.000000 0.000000 0.000000 -0.075000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_0_collision"><pose>-9.085227 -0.909144 0.000000 0.000000 0.000000 -0.075000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_1"><pose>-7.068906 -1.043765 0.000100 0.000000 0.000000 -0.058333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_1_collision"><pose>-7.068906 -1.043765 0.000100 0.000000 0.000000 -0.058333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_2"><pose>-5.050622 -1.144763 0.000000 0.000000 0.000000 -0.041667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_2_collision"><pose>-5.050622 -1.144763 0.000000 0.000000 0.000000 -0.041667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_3"><pose>-3.030934 -1.212111 0.000100 0.000000 0.000000 -0.025000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_3_collision"><pose>-3.030934 -1.212111 0.000100 0.000000 0.000000 -0.025000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_4"><pose>-1.010405 -1.245790 0.000000 0.000000 0.000000 -0.008333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_4_collision"><pose>-1.010405 -1.245790 0.000000 0.000000 0.000000 -0.008333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_5"><pose>1.010405 -1.245790 0.000100 0.000000 0.000000 0.008333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_5_collision"><pose>1.010405 -1.245790 0.000100 0.000000 0.000000 0.008333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_6"><pose>3.030934 -1.212111 0.000000 0.000000 0.000000 0.025000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_6_collision"><pose>3.030934 -1.212111 0.000000 0.000000 0.000000 0.025000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_7"><pose>5.050622 -1.144763 0.000100 0.000000 0.000000 0.041667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_7_collision"><pose>5.050622 -1.144763 0.000100 0.000000 0.000000 0.041667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_8"><pose>7.068906 -1.043765 0.000000 0.000000 0.000000 0.058333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_8_collision"><pose>7.068906 -1.043765 0.000000 0.000000 0.000000 0.058333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_9"><pose>9.085227 -0.909144 0.000100 0.000000 0.000000 0.075000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_9_collision"><pose>9.085227 -0.909144 0.000100 0.000000 0.000000 0.075000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_10"><pose>11.099024 -0.740938 0.000000 0.000000 0.000000 0.091667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_10_collision"><pose>11.099024 -0.740938 0.000000 0.000000 0.000000 0.091667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_11"><pose>13.109739 -0.539194 0.000100 0.000000 0.000000 0.108333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_11_collision"><pose>13.109739 -0.539194 0.000100 0.000000 0.000000 0.108333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_12"><pose>15.116811 -0.303967 0.000000 0.000000 0.000000 0.125000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_12_collision"><pose>15.116811 -0.303967 0.000000 0.000000 0.000000 0.125000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_13"><pose>17.119685 -0.035323 0.000100 0.000000 0.000000 0.141667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_13_collision"><pose>17.119685 -0.035323 0.000100 0.000000 0.000000 0.141667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_14"><pose>19.117804 0.266663 0.000000 0.000000 0.000000 0.158333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_14_collision"><pose>19.117804 0.266663 0.000000 0.000000 0.000000 0.158333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_15"><pose>21.110612 0.601907 0.000100 0.000000 0.000000 0.175000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_15_collision"><pose>21.110612 0.601907 0.000100 0.000000 0.000000 0.175000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_16"><pose>23.097556 0.970317 0.000000 0.000000 0.000000 0.191667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_16_collision"><pose>23.097556 0.970317 0.000000 0.000000 0.000000 0.191667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_17"><pose>25.078084 1.371790 0.000100 0.000000 0.000000 0.208333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_17_collision"><pose>25.078084 1.371790 0.000100 0.000000 0.000000 0.208333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_18"><pose>27.051646 1.806215 0.000000 0.000000 0.000000 0.225000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_18_collision"><pose>27.051646 1.806215 0.000000 0.000000 0.000000 0.225000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_19"><pose>29.017695 2.273470 0.000100 0.000000 0.000000 0.241667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_19_collision"><pose>29.017695 2.273470 0.000100 0.000000 0.000000 0.241667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_20"><pose>30.975682 2.773426 0.000000 0.000000 0.000000 0.258333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_20_collision"><pose>30.975682 2.773426 0.000000 0.000000 0.000000 0.258333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_21"><pose>32.925066 3.305945 0.000100 0.000000 0.000000 0.275000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_21_collision"><pose>32.925066 3.305945 0.000100 0.000000 0.000000 0.275000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_22"><pose>34.865304 3.870878 0.000000 0.000000 0.000000 0.291667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_22_collision"><pose>34.865304 3.870878 0.000000 0.000000 0.000000 0.291667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_23"><pose>36.795858 4.468068 0.000100 0.000000 0.000000 0.308333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_23_collision"><pose>36.795858 4.468068 0.000100 0.000000 0.000000 0.308333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_24"><pose>38.716190 5.097349 0.000000 0.000000 0.000000 0.325000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_24_collision"><pose>38.716190 5.097349 0.000000 0.000000 0.000000 0.325000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_25"><pose>40.625769 5.758548 0.000100 0.000000 0.000000 0.341667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_25_collision"><pose>40.625769 5.758548 0.000100 0.000000 0.000000 0.341667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_26"><pose>42.524062 6.451479 0.000000 0.000000 0.000000 0.358333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_26_collision"><pose>42.524062 6.451479 0.000000 0.000000 0.000000 0.358333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_27"><pose>44.410544 7.175951 0.000100 0.000000 0.000000 0.375000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_27_collision"><pose>44.410544 7.175951 0.000100 0.000000 0.000000 0.375000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_28"><pose>46.284690 7.931762 0.000000 0.000000 0.000000 0.391667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_28_collision"><pose>46.284690 7.931762 0.000000 0.000000 0.000000 0.391667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_29"><pose>48.145979 8.718702 0.000100 0.000000 0.000000 0.408333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_29_collision"><pose>48.145979 8.718702 0.000100 0.000000 0.000000 0.408333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_30"><pose>49.993895 9.536554 0.000000 0.000000 0.000000 0.425000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_30_collision"><pose>49.993895 9.536554 0.000000 0.000000 0.000000 0.425000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_31"><pose>51.827924 10.385088 0.000100 0.000000 0.000000 0.441667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_31_collision"><pose>51.827924 10.385088 0.000100 0.000000 0.000000 0.441667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_32"><pose>53.647556 11.264071 0.000000 0.000000 0.000000 0.458333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_32_collision"><pose>53.647556 11.264071 0.000000 0.000000 0.000000 0.458333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_33"><pose>55.452287 12.173258 0.000100 0.000000 0.000000 0.475000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_33_collision"><pose>55.452287 12.173258 0.000100 0.000000 0.000000 0.475000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_34"><pose>57.241614 13.112395 0.000000 0.000000 0.000000 0.491667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_34_collision"><pose>57.241614 13.112395 0.000000 0.000000 0.000000 0.491667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_35"><pose>59.015042 14.081223 0.000100 0.000000 0.000000 0.508333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_35_collision"><pose>59.015042 14.081223 0.000100 0.000000 0.000000 0.508333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_36"><pose>60.772077 15.079472 0.000000 0.000000 0.000000 0.525000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_36_collision"><pose>60.772077 15.079472 0.000000 0.000000 0.000000 0.525000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_37"><pose>62.512231 16.106865 0.000100 0.000000 0.000000 0.541667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_37_collision"><pose>62.512231 16.106865 0.000100 0.000000 0.000000 0.541667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_38"><pose>64.235021 17.163117 0.000000 0.000000 0.000000 0.558333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_38_collision"><pose>64.235021 17.163117 0.000000 0.000000 0.000000 0.558333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_39"><pose>65.939968 18.247933 0.000100 0.000000 0.000000 0.575000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_39_collision"><pose>65.939968 18.247933 0.000100 0.000000 0.000000 0.575000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_40"><pose>67.626600 19.361014 0.000000 0.000000 0.000000 0.591667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_40_collision"><pose>67.626600 19.361014 0.000000 0.000000 0.000000 0.591667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_41"><pose>69.294446 20.502049 0.000100 0.000000 0.000000 0.608333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_41_collision"><pose>69.294446 20.502049 0.000100 0.000000 0.000000 0.608333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_42"><pose>70.943044 21.670722 0.000000 0.000000 0.000000 0.625000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_42_collision"><pose>70.943044 21.670722 0.000000 0.000000 0.000000 0.625000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_43"><pose>72.571937 22.866708 0.000100 0.000000 0.000000 0.641667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_43_collision"><pose>72.571937 22.866708 0.000100 0.000000 0.000000 0.641667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_44"><pose>74.180671 24.089674 0.000000 0.000000 0.000000 0.658333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_44_collision"><pose>74.180671 24.089674 0.000000 0.000000 0.000000 0.658333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_45"><pose>75.768800 25.339282 0.000100 0.000000 0.000000 0.675000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_45_collision"><pose>75.768800 25.339282 0.000100 0.000000 0.000000 0.675000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_46"><pose>77.335882 26.615184 0.000000 0.000000 0.000000 0.691667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_46_collision"><pose>77.335882 26.615184 0.000000 0.000000 0.000000 0.691667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_47"><pose>78.881483 27.917026 0.000100 0.000000 0.000000 0.708333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_47_collision"><pose>78.881483 27.917026 0.000100 0.000000 0.000000 0.708333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_48"><pose>80.405172 29.244445 0.000000 0.000000 0.000000 0.725000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_48_collision"><pose>80.405172 29.244445 0.000000 0.000000 0.000000 0.725000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_49"><pose>81.906528 30.597074 0.000100 0.000000 0.000000 0.741667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_49_collision"><pose>81.906528 30.597074 0.000100 0.000000 0.000000 0.741667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_50"><pose>83.385132 31.974536 0.000000 0.000000 0.000000 0.758333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_50_collision"><pose>83.385132 31.974536 0.000000 0.000000 0.000000 0.758333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_51"><pose>84.840574 33.376450 0.000100 0.000000 0.000000 0.775000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_51_collision"><pose>84.840574 33.376450 0.000100 0.000000 0.000000 0.775000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_52"><pose>86.272450 34.802424 0.000000 0.000000 0.000000 0.791667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_52_collision"><pose>86.272450 34.802424 0.000000 0.000000 0.000000 0.791667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_53"><pose>87.680362 36.252065 0.000100 0.000000 0.000000 0.808333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_53_collision"><pose>87.680362 36.252065 0.000100 0.000000 0.000000 0.808333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_54"><pose>89.063919 37.724968 0.000000 0.000000 0.000000 0.825000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_54_collision"><pose>89.063919 37.724968 0.000000 0.000000 0.000000 0.825000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_55"><pose>90.422736 39.220725 0.000100 0.000000 0.000000 0.841667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_55_collision"><pose>90.422736 39.220725 0.000100 0.000000 0.000000 0.841667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_56"><pose>91.756436 40.738920 0.000000 0.000000 0.000000 0.858333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_56_collision"><pose>91.756436 40.738920 0.000000 0.000000 0.000000 0.858333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_57"><pose>93.064650 42.279131 0.000100 0.000000 0.000000 0.875000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_57_collision"><pose>93.064650 42.279131 0.000100 0.000000 0.000000 0.875000</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_58"><pose>94.347012 43.840931 0.000000 0.000000 0.000000 0.891667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_58_collision"><pose>94.347012 43.840931 0.000000 0.000000 0.000000 0.891667</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
+        <visual name="asphalt_59"><pose>95.603168 45.423886 0.000100 0.000000 0.000000 0.908333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><material><ambient>0.055 0.058 0.062 1</ambient><diffuse>0.16 0.17 0.18 1</diffuse></material></visual>
+        <collision name="asphalt_59_collision"><pose>95.603168 45.423886 0.000100 0.000000 0.000000 0.908333</pose><geometry><box><size>2.180 10.02 0.04</size></box></geometry><surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2></ode></friction></surface></collision>
 
-        <!-- Solid edge lines: left edge of the carriageway and the
-             carriageway / hard-shoulder boundary (0.15 m wide). -->
-        <visual name="edge_left">
-          <pose>50 3.65 0.025 0 0 0</pose>
-          <geometry><box><size>118 0.15 0.006</size></box></geometry>
-          <material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material>
-        </visual>
-        <visual name="edge_right">
-          <pose>50 -3.65 0.025 0 0 0</pose>
-          <geometry><box><size>118 0.15 0.006</size></box></geometry>
-          <material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material>
-        </visual>
+        <!-- Solid edge lines at the lane boundaries (0.15 m wide). -->
+        <visual name="edge_0_0"><pose>-7.750922 3.908460 0.025000 0.000000 0.000000 -0.066667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_0"><pose>-8.237229 -3.375324 0.025000 0.000000 0.000000 -0.066667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_1"><pose>-5.815076 3.795407 0.025050 0.000000 0.000000 -0.050000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_1"><pose>-6.179924 -3.495470 0.025050 0.000000 0.000000 -0.050000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_2"><pose>-3.877615 3.714633 0.025000 0.000000 0.000000 -0.033333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_2"><pose>-4.120903 -3.581312 0.025000 0.000000 0.000000 -0.033333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_3"><pose>-1.939077 3.666159 0.025050 0.000000 0.000000 -0.016667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_3"><pose>-2.060738 -3.632827 0.025050 0.000000 0.000000 -0.016667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_4"><pose>0.000000 3.650000 0.025000 0.000000 0.000000 0.000000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_4"><pose>0.000000 -3.650000 0.025000 0.000000 0.000000 0.000000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_5"><pose>1.939077 3.666159 0.025050 0.000000 0.000000 0.016667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_5"><pose>2.060738 -3.632827 0.025050 0.000000 0.000000 0.016667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_6"><pose>3.877615 3.714633 0.025000 0.000000 0.000000 0.033333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_6"><pose>4.120903 -3.581312 0.025000 0.000000 0.000000 0.033333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_7"><pose>5.815076 3.795407 0.025050 0.000000 0.000000 0.050000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_7"><pose>6.179924 -3.495470 0.025050 0.000000 0.000000 0.050000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_8"><pose>7.750922 3.908460 0.025000 0.000000 0.000000 0.066667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_8"><pose>8.237229 -3.375324 0.025000 0.000000 0.000000 0.066667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_9"><pose>9.684615 4.053759 0.025050 0.000000 0.000000 0.083333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_9"><pose>10.292245 -3.220908 0.025050 0.000000 0.000000 0.083333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_10"><pose>11.615618 4.231265 0.025000 0.000000 0.000000 0.100000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_10"><pose>12.344402 -3.032265 0.025000 0.000000 0.000000 0.100000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_11"><pose>13.543394 4.440929 0.025050 0.000000 0.000000 0.116667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_11"><pose>14.393130 -2.809447 0.025050 0.000000 0.000000 0.116667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_12"><pose>15.467409 4.682691 0.025000 0.000000 0.000000 0.133333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_12"><pose>16.437861 -2.552516 0.025000 0.000000 0.000000 0.133333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_13"><pose>17.387127 4.956485 0.025050 0.000000 0.000000 0.150000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_13"><pose>18.478025 -2.261544 0.025050 0.000000 0.000000 0.150000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_14"><pose>19.302015 5.262235 0.025000 0.000000 0.000000 0.166667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_14"><pose>20.513057 -1.936611 0.025000 0.000000 0.000000 0.166667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_15"><pose>21.211542 5.599856 0.025050 0.000000 0.000000 0.183333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_15"><pose>22.542391 -1.577807 0.025050 0.000000 0.000000 0.183333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_16"><pose>23.115177 5.969254 0.025000 0.000000 0.000000 0.200000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_16"><pose>24.565463 -1.185232 0.025000 0.000000 0.000000 0.200000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_17"><pose>25.012391 6.370326 0.025050 0.000000 0.000000 0.216667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_17"><pose>26.581711 -0.758996 0.025050 0.000000 0.000000 0.216667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_18"><pose>26.902657 6.802961 0.025000 0.000000 0.000000 0.233333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_18"><pose>28.590576 -0.299216 0.025000 0.000000 0.000000 0.233333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_19"><pose>28.785451 7.267040 0.025050 0.000000 0.000000 0.250000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_19"><pose>30.591500 0.193979 0.025050 0.000000 0.000000 0.250000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_20"><pose>30.660248 7.762432 0.025000 0.000000 0.000000 0.266667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_20"><pose>32.583925 0.720453 0.025000 0.000000 0.000000 0.266667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_21"><pose>32.526530 8.289001 0.025050 0.000000 0.000000 0.283333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_21"><pose>34.567300 1.280060 0.025050 0.000000 0.000000 0.283333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_22"><pose>34.383776 8.846599 0.025000 0.000000 0.000000 0.300000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_22"><pose>36.541074 1.872643 0.025000 0.000000 0.000000 0.300000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_23"><pose>36.231472 9.435074 0.025050 0.000000 0.000000 0.316667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_23"><pose>38.504697 2.498039 0.025050 0.000000 0.000000 0.316667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_24"><pose>38.069103 10.054259 0.025000 0.000000 0.000000 0.333333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_24"><pose>40.457624 3.156074 0.025000 0.000000 0.000000 0.333333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_25"><pose>39.896160 10.703985 0.025050 0.000000 0.000000 0.350000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_25"><pose>42.399314 3.846564 0.025050 0.000000 0.000000 0.350000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_26"><pose>41.712135 11.384070 0.025000 0.000000 0.000000 0.366667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_26"><pose>44.329226 4.569319 0.025000 0.000000 0.000000 0.366667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_27"><pose>43.516523 12.094325 0.025050 0.000000 0.000000 0.383333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_27"><pose>46.246825 5.324137 0.025050 0.000000 0.000000 0.383333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_28"><pose>45.308824 12.834553 0.025000 0.000000 0.000000 0.400000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_28"><pose>48.151578 6.110808 0.025000 0.000000 0.000000 0.400000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_29"><pose>47.088539 13.604549 0.025050 0.000000 0.000000 0.416667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_29"><pose>50.042956 6.929115 0.025050 0.000000 0.000000 0.416667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_30"><pose>48.855175 14.404099 0.025000 0.000000 0.000000 0.433333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_30"><pose>51.920433 7.778829 0.025000 0.000000 0.000000 0.433333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_31"><pose>50.608240 15.232980 0.025050 0.000000 0.000000 0.450000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_31"><pose>53.783488 8.659716 0.025050 0.000000 0.000000 0.450000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_32"><pose>52.347247 16.090962 0.025000 0.000000 0.000000 0.466667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_32"><pose>55.631604 9.571529 0.025000 0.000000 0.000000 0.466667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_33"><pose>54.071714 16.977807 0.025050 0.000000 0.000000 0.483333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_33"><pose>57.464267 10.514017 0.025050 0.000000 0.000000 0.483333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_34"><pose>55.781161 17.893269 0.025000 0.000000 0.000000 0.500000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_34"><pose>59.280968 11.486916 0.025000 0.000000 0.000000 0.500000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_35"><pose>57.475114 18.837093 0.025050 0.000000 0.000000 0.516667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_35"><pose>61.081202 12.489958 0.025050 0.000000 0.000000 0.516667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_36"><pose>59.153102 19.809017 0.025000 0.000000 0.000000 0.533333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_36"><pose>62.864470 13.522862 0.025000 0.000000 0.000000 0.533333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_37"><pose>60.814659 20.808772 0.025050 0.000000 0.000000 0.550000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_37"><pose>64.630276 14.585343 0.025050 0.000000 0.000000 0.550000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_38"><pose>62.459323 21.836079 0.025000 0.000000 0.000000 0.566667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_38"><pose>66.378129 15.677105 0.025000 0.000000 0.000000 0.566667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_39"><pose>64.086638 22.890653 0.025050 0.000000 0.000000 0.583333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_39"><pose>68.107545 16.797845 0.025050 0.000000 0.000000 0.583333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_40"><pose>65.696152 23.972201 0.025000 0.000000 0.000000 0.600000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_40"><pose>69.818042 17.947251 0.025000 0.000000 0.000000 0.600000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_41"><pose>67.287417 25.080423 0.025050 0.000000 0.000000 0.616667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_41"><pose>71.509146 19.125005 0.025050 0.000000 0.000000 0.616667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_42"><pose>68.859991 26.215011 0.025000 0.000000 0.000000 0.633333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_42"><pose>73.180386 20.330779 0.025000 0.000000 0.000000 0.633333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_43"><pose>70.413438 27.375650 0.025050 0.000000 0.000000 0.650000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_43"><pose>74.831299 21.564238 0.025050 0.000000 0.000000 0.650000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_44"><pose>71.947327 28.562017 0.025000 0.000000 0.000000 0.666667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_44"><pose>76.461426 22.825040 0.025000 0.000000 0.000000 0.666667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_45"><pose>73.461230 29.773783 0.025050 0.000000 0.000000 0.683333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_45"><pose>78.070314 24.112835 0.025050 0.000000 0.000000 0.683333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_46"><pose>74.954728 31.010612 0.025000 0.000000 0.000000 0.700000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_46"><pose>79.657517 25.427264 0.025000 0.000000 0.000000 0.700000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_47"><pose>76.427406 32.272158 0.025050 0.000000 0.000000 0.716667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_47"><pose>81.222593 26.767962 0.025050 0.000000 0.000000 0.716667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_48"><pose>77.878854 33.558074 0.025000 0.000000 0.000000 0.733333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_48"><pose>82.765108 28.134558 0.025000 0.000000 0.000000 0.733333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_49"><pose>79.308670 34.868000 0.025050 0.000000 0.000000 0.750000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_49"><pose>84.284633 29.526671 0.025050 0.000000 0.000000 0.750000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_50"><pose>80.716456 36.201574 0.025000 0.000000 0.000000 0.766667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_50"><pose>85.780746 30.943916 0.025000 0.000000 0.000000 0.766667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_51"><pose>82.101821 37.558424 0.025050 0.000000 0.000000 0.783333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_51"><pose>87.253031 32.385897 0.025050 0.000000 0.000000 0.783333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_52"><pose>83.464381 38.938174 0.025000 0.000000 0.000000 0.800000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_52"><pose>88.701081 33.852215 0.025000 0.000000 0.000000 0.800000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_53"><pose>84.803757 40.340441 0.025050 0.000000 0.000000 0.816667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_53"><pose>90.124491 35.342463 0.025050 0.000000 0.000000 0.816667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_54"><pose>86.119577 41.764835 0.025000 0.000000 0.000000 0.833333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_54"><pose>91.522868 36.856226 0.025000 0.000000 0.000000 0.833333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_55"><pose>87.411475 43.210961 0.025050 0.000000 0.000000 0.850000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_55"><pose>92.895822 38.393084 0.025050 0.000000 0.000000 0.850000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_56"><pose>88.679093 44.678416 0.025000 0.000000 0.000000 0.866667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_56"><pose>94.242972 39.952610 0.025000 0.000000 0.000000 0.866667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_57"><pose>89.922078 46.166794 0.025050 0.000000 0.000000 0.883333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_57"><pose>95.563945 41.534371 0.025050 0.000000 0.000000 0.883333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_0_58"><pose>91.140086 47.675680 0.025000 0.000000 0.000000 0.900000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="edge_1_58"><pose>96.858372 43.137927 0.025000 0.000000 0.000000 0.900000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
 
         <!-- Broken centre line: 6 m dash, 9 m gap (15 m cycle). -->
-        <visual name="dash_0"><pose>-6 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_1"><pose>9 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_2"><pose>24 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_3"><pose>39 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_4"><pose>54 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_5"><pose>69 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_6"><pose>84 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-        <visual name="dash_7"><pose>99 0 0.025 0 0 0</pose><geometry><box><size>6 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
-
+        <visual name="dash_0_0"><pose>-7.994075 0.266568 0.025000 0.000000 0.000000 -0.066667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_0_1"><pose>-5.997500 0.149969 0.025050 0.000000 0.000000 -0.050000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_0_2"><pose>-3.999259 0.066660 0.025000 0.000000 0.000000 -0.033333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_1_0"><pose>6.996031 0.204109 0.025000 0.000000 0.000000 0.058333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_1_1"><pose>8.991565 0.337342 0.025050 0.000000 0.000000 0.075000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_1_2"><pose>10.984601 0.503814 0.025000 0.000000 0.000000 0.091667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_2_0"><pose>21.876966 2.011024 0.025000 0.000000 0.000000 0.183333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_2_1"><pose>23.840320 2.392011 0.025050 0.000000 0.000000 0.200000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_2_2"><pose>25.797051 2.805665 0.025000 0.000000 0.000000 0.216667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_3_0"><pose>36.416519 5.659119 0.025000 0.000000 0.000000 0.308333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_3_1"><pose>38.317054 6.281913 0.025050 0.000000 0.000000 0.325000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_3_2"><pose>40.206946 6.936295 0.025000 0.000000 0.000000 0.341667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_4_0"><pose>50.387804 11.091464 0.025000 0.000000 0.000000 0.433333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_4_1"><pose>52.195864 11.946348 0.025050 0.000000 0.000000 0.450000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_4_2"><pose>53.989426 12.831246 0.025000 0.000000 0.000000 0.466667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_5_0"><pose>63.572804 18.223291 0.025000 0.000000 0.000000 0.558333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_5_1"><pose>65.260175 19.296924 0.025050 0.000000 0.000000 0.575000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_5_2"><pose>66.929418 20.398529 0.025000 0.000000 0.000000 0.591667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_6_0"><pose>75.765772 26.943309 0.025000 0.000000 0.000000 0.683333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_6_1"><pose>77.306122 28.218938 0.025050 0.000000 0.000000 0.700000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_6_2"><pose>78.824999 29.520060 0.025000 0.000000 0.000000 0.716667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_7_0"><pose>86.776441 37.115446 0.025000 0.000000 0.000000 0.808333</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_7_1"><pose>88.145734 38.573164 0.025050 0.000000 0.000000 0.825000</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
+        <visual name="dash_7_2"><pose>89.490543 40.053501 0.025000 0.000000 0.000000 0.841667</pose><geometry><box><size>2.120 0.15 0.006</size></box></geometry><material><ambient>0.8 0.8 0.76 1</ambient><diffuse>0.95 0.95 0.9 1</diffuse></material></visual>
       </link>
     </model>
 
@@ -116,106 +348,271 @@
       <static>true</static>
       <link name="guardrail_link">
 
-        <!-- Continuous W-beam -8..30 -->
-        <visual name="rail_left">
-          <pose>11 -6.15 0.60 0 0 0</pose>
-          <geometry><box><size>38 0.07 0.31</size></box></geometry>
-          <material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material>
-        </visual>
-        <collision name="rail_left_collision">
-          <pose>11 -6.15 0.60 0 0 0</pose>
-          <geometry><box><size>38 0.07 0.31</size></box></geometry>
-          <surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface>
-        </collision>
-        <visual name="rail_left_ridge_a"><pose>11 -6.105 0.53 0 0 0</pose><geometry><box><size>37.9 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
-        <visual name="rail_left_ridge_b"><pose>11 -6.105 0.67 0 0 0</pose><geometry><box><size>37.9 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <!-- Continuous W-beam -8..30 m and 38..100 m along the arc. -->
+        <visual name="rail_0"><pose>-7.354577 -5.935431 0.600000 0.000000 0.000000 -0.058333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_0_collision"><pose>-7.354577 -5.935431 0.600000 0.000000 0.000000 -0.058333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_0_ridge_0"><pose>-7.351954 -5.890507 0.530000 0.000000 0.000000 -0.058333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_0_ridge_1"><pose>-7.351954 -5.890507 0.670000 0.000000 0.000000 -0.058333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_1"><pose>-5.254729 -6.040511 0.600100 0.000000 0.000000 -0.041667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_1_collision"><pose>-5.254729 -6.040511 0.600100 0.000000 0.000000 -0.041667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_1_ridge_0"><pose>-5.252855 -5.995550 0.530100 0.000000 0.000000 -0.041667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_1_ridge_1"><pose>-5.252855 -5.995550 0.670100 0.000000 0.000000 -0.041667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_2"><pose>-3.153421 -6.110580 0.600000 0.000000 0.000000 -0.025000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_2_collision"><pose>-3.153421 -6.110580 0.600000 0.000000 0.000000 -0.025000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_2_ridge_0"><pose>-3.152297 -6.065594 0.530000 0.000000 0.000000 -0.025000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_2_ridge_1"><pose>-3.152297 -6.065594 0.670000 0.000000 0.000000 -0.025000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_3"><pose>-1.051238 -6.145620 0.600100 0.000000 0.000000 -0.008333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_3_collision"><pose>-1.051238 -6.145620 0.600100 0.000000 0.000000 -0.008333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_3_ridge_0"><pose>-1.050863 -6.100621 0.530100 0.000000 0.000000 -0.008333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_3_ridge_1"><pose>-1.050863 -6.100621 0.670100 0.000000 0.000000 -0.008333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_4"><pose>1.051238 -6.145620 0.600000 0.000000 0.000000 0.008333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_4_collision"><pose>1.051238 -6.145620 0.600000 0.000000 0.000000 0.008333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_4_ridge_0"><pose>1.050863 -6.100621 0.530000 0.000000 0.000000 0.008333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_4_ridge_1"><pose>1.050863 -6.100621 0.670000 0.000000 0.000000 0.008333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_5"><pose>3.153421 -6.110580 0.600100 0.000000 0.000000 0.025000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_5_collision"><pose>3.153421 -6.110580 0.600100 0.000000 0.000000 0.025000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_5_ridge_0"><pose>3.152297 -6.065594 0.530100 0.000000 0.000000 0.025000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_5_ridge_1"><pose>3.152297 -6.065594 0.670100 0.000000 0.000000 0.025000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_6"><pose>5.254729 -6.040511 0.600000 0.000000 0.000000 0.041667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_6_collision"><pose>5.254729 -6.040511 0.600000 0.000000 0.000000 0.041667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_6_ridge_0"><pose>5.252855 -5.995550 0.530000 0.000000 0.000000 0.041667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_6_ridge_1"><pose>5.252855 -5.995550 0.670000 0.000000 0.000000 0.041667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_7"><pose>7.354577 -5.935431 0.600100 0.000000 0.000000 0.058333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_7_collision"><pose>7.354577 -5.935431 0.600100 0.000000 0.000000 0.058333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_7_ridge_0"><pose>7.351954 -5.890507 0.530100 0.000000 0.000000 0.058333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_7_ridge_1"><pose>7.351954 -5.890507 0.670100 0.000000 0.000000 0.058333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_8"><pose>9.452383 -5.795369 0.600000 0.000000 0.000000 0.075000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_8_collision"><pose>9.452383 -5.795369 0.600000 0.000000 0.000000 0.075000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_8_ridge_0"><pose>9.449011 -5.750496 0.530000 0.000000 0.000000 0.075000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_8_ridge_1"><pose>9.449011 -5.750496 0.670000 0.000000 0.000000 0.075000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_9"><pose>11.547562 -5.620366 0.600100 0.000000 0.000000 0.091667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_9_collision"><pose>11.547562 -5.620366 0.600100 0.000000 0.000000 0.091667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_9_ridge_0"><pose>11.543443 -5.575555 0.530100 0.000000 0.000000 0.091667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_9_ridge_1"><pose>11.543443 -5.575555 0.670100 0.000000 0.000000 0.091667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_10"><pose>13.639534 -5.410468 0.600000 0.000000 0.000000 0.108333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_10_collision"><pose>13.639534 -5.410468 0.600000 0.000000 0.000000 0.108333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_10_ridge_0"><pose>13.634669 -5.365732 0.530000 0.000000 0.000000 0.108333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_10_ridge_1"><pose>13.634669 -5.365732 0.670000 0.000000 0.000000 0.108333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_11"><pose>15.727718 -5.165736 0.600100 0.000000 0.000000 0.125000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_11_collision"><pose>15.727718 -5.165736 0.600100 0.000000 0.000000 0.125000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_11_ridge_0"><pose>15.722107 -5.121087 0.530100 0.000000 0.000000 0.125000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_11_ridge_1"><pose>15.722107 -5.121087 0.670100 0.000000 0.000000 0.125000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_12"><pose>17.811532 -4.886236 0.600000 0.000000 0.000000 0.141667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_12_collision"><pose>17.811532 -4.886236 0.600000 0.000000 0.000000 0.141667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_12_ridge_0"><pose>17.805179 -4.841686 0.530000 0.000000 0.000000 0.141667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_12_ridge_1"><pose>17.805179 -4.841686 0.670000 0.000000 0.000000 0.141667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_13"><pose>19.890399 -4.572045 0.600100 0.000000 0.000000 0.158333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_13_collision"><pose>19.890399 -4.572045 0.600100 0.000000 0.000000 0.158333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_13_ridge_0"><pose>19.883304 -4.527608 0.530100 0.000000 0.000000 0.158333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_13_ridge_1"><pose>19.883304 -4.527608 0.670100 0.000000 0.000000 0.158333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_14"><pose>21.963742 -4.223253 0.600000 0.000000 0.000000 0.175000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_14_collision"><pose>21.963742 -4.223253 0.600000 0.000000 0.000000 0.175000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_14_ridge_0"><pose>21.955907 -4.178940 0.530000 0.000000 0.000000 0.175000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_14_ridge_1"><pose>21.955907 -4.178940 0.670000 0.000000 0.000000 0.175000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_15"><pose>24.030983 -3.839955 0.600100 0.000000 0.000000 0.191667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_15_collision"><pose>24.030983 -3.839955 0.600100 0.000000 0.000000 0.191667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_15_ridge_0"><pose>24.022411 -3.795779 0.530100 0.000000 0.000000 0.191667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_15_ridge_1"><pose>24.022411 -3.795779 0.670100 0.000000 0.000000 0.191667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_16"><pose>26.091549 -3.422257 0.600000 0.000000 0.000000 0.208333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_16_collision"><pose>26.091549 -3.422257 0.600000 0.000000 0.000000 0.208333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_16_ridge_0"><pose>26.082242 -3.378230 0.530000 0.000000 0.000000 0.208333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_16_ridge_1"><pose>26.082242 -3.378230 0.670000 0.000000 0.000000 0.208333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_17"><pose>28.144868 -2.970277 0.600100 0.000000 0.000000 0.225000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_17_collision"><pose>28.144868 -2.970277 0.600100 0.000000 0.000000 0.225000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_17_ridge_0"><pose>28.134828 -2.926411 0.530100 0.000000 0.000000 0.225000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_17_ridge_1"><pose>28.134828 -2.926411 0.670100 0.000000 0.000000 0.225000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_18"><pose>30.190368 -2.484138 0.600000 0.000000 0.000000 0.241667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_18_collision"><pose>30.190368 -2.484138 0.600000 0.000000 0.000000 0.241667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_18_ridge_0"><pose>30.179599 -2.440446 0.530000 0.000000 0.000000 0.241667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_18_ridge_1"><pose>30.179599 -2.440446 0.670000 0.000000 0.000000 0.241667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_19"><pose>40.280803 0.453861 0.600100 0.000000 0.000000 0.325000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_19_collision"><pose>40.280803 0.453861 0.600100 0.000000 0.000000 0.325000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_19_ridge_0"><pose>40.266434 0.496505 0.530100 0.000000 0.000000 0.325000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_19_ridge_1"><pose>40.266434 0.496505 0.670100 0.000000 0.000000 0.325000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_20"><pose>42.267552 1.141780 0.600000 0.000000 0.000000 0.341667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_20_collision"><pose>42.267552 1.141780 0.600000 0.000000 0.000000 0.341667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_20_ridge_0"><pose>42.252475 1.184179 0.530000 0.000000 0.000000 0.341667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_20_ridge_1"><pose>42.252475 1.184179 0.670000 0.000000 0.000000 0.341667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_21"><pose>44.242561 1.862714 0.600100 0.000000 0.000000 0.358333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_21_collision"><pose>44.242561 1.862714 0.600100 0.000000 0.000000 0.358333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_21_ridge_0"><pose>44.226778 1.904856 0.530100 0.000000 0.000000 0.358333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_21_ridge_1"><pose>44.226778 1.904856 0.670100 0.000000 0.000000 0.358333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_22"><pose>46.205280 2.616463 0.600000 0.000000 0.000000 0.375000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_22_collision"><pose>46.205280 2.616463 0.600000 0.000000 0.000000 0.375000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_22_ridge_0"><pose>46.188797 2.658336 0.530000 0.000000 0.000000 0.375000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_22_ridge_1"><pose>46.188797 2.658336 0.670000 0.000000 0.000000 0.375000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_23"><pose>48.155164 3.402819 0.600100 0.000000 0.000000 0.391667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_23_collision"><pose>48.155164 3.402819 0.600100 0.000000 0.000000 0.391667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_23_ridge_0"><pose>48.137986 3.444411 0.530100 0.000000 0.000000 0.391667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_23_ridge_1"><pose>48.137986 3.444411 0.670100 0.000000 0.000000 0.391667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_24"><pose>50.091672 4.221561 0.600000 0.000000 0.000000 0.408333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_24_collision"><pose>50.091672 4.221561 0.600000 0.000000 0.000000 0.408333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_24_ridge_0"><pose>50.073804 4.262862 0.530000 0.000000 0.000000 0.408333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_24_ridge_1"><pose>50.073804 4.262862 0.670000 0.000000 0.000000 0.408333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_25"><pose>52.014267 5.072464 0.600100 0.000000 0.000000 0.425000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_25_collision"><pose>52.014267 5.072464 0.600100 0.000000 0.000000 0.425000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_25_ridge_0"><pose>51.995712 5.113461 0.530100 0.000000 0.000000 0.425000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_25_ridge_1"><pose>51.995712 5.113461 0.670100 0.000000 0.000000 0.425000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_26"><pose>53.922413 5.955290 0.600000 0.000000 0.000000 0.441667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_26_collision"><pose>53.922413 5.955290 0.600000 0.000000 0.000000 0.441667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_26_ridge_0"><pose>53.903178 5.995972 0.530000 0.000000 0.000000 0.441667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_26_ridge_1"><pose>53.903178 5.995972 0.670000 0.000000 0.000000 0.441667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_27"><pose>55.815581 6.869794 0.600100 0.000000 0.000000 0.458333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_27_collision"><pose>55.815581 6.869794 0.600100 0.000000 0.000000 0.458333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_27_ridge_0"><pose>55.795671 6.910150 0.530100 0.000000 0.000000 0.458333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_27_ridge_1"><pose>55.795671 6.910150 0.670100 0.000000 0.000000 0.458333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_28"><pose>57.693245 7.815723 0.600000 0.000000 0.000000 0.475000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_28_collision"><pose>57.693245 7.815723 0.600000 0.000000 0.000000 0.475000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_28_ridge_0"><pose>57.672665 7.855741 0.530000 0.000000 0.000000 0.475000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_28_ridge_1"><pose>57.672665 7.855741 0.670000 0.000000 0.000000 0.475000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_29"><pose>59.554884 8.792814 0.600100 0.000000 0.000000 0.491667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_29_collision"><pose>59.554884 8.792814 0.600100 0.000000 0.000000 0.491667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_29_ridge_0"><pose>59.533639 8.832483 0.530100 0.000000 0.000000 0.491667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_29_ridge_1"><pose>59.533639 8.832483 0.670100 0.000000 0.000000 0.491667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_30"><pose>61.399980 9.800794 0.600000 0.000000 0.000000 0.508333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_30_collision"><pose>61.399980 9.800794 0.600000 0.000000 0.000000 0.508333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_30_ridge_0"><pose>61.378077 9.840104 0.530000 0.000000 0.000000 0.508333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_30_ridge_1"><pose>61.378077 9.840104 0.670000 0.000000 0.000000 0.508333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_31"><pose>63.228021 10.839385 0.600100 0.000000 0.000000 0.525000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_31_collision"><pose>63.228021 10.839385 0.600100 0.000000 0.000000 0.525000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_31_ridge_0"><pose>63.205466 10.878324 0.530100 0.000000 0.000000 0.525000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_31_ridge_1"><pose>63.205466 10.878324 0.670100 0.000000 0.000000 0.525000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_32"><pose>65.038498 11.908297 0.600000 0.000000 0.000000 0.541667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_32_collision"><pose>65.038498 11.908297 0.600000 0.000000 0.000000 0.541667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_32_ridge_0"><pose>65.015298 11.946855 0.530000 0.000000 0.000000 0.541667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_32_ridge_1"><pose>65.015298 11.946855 0.670000 0.000000 0.000000 0.541667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_33"><pose>66.830910 13.007234 0.600100 0.000000 0.000000 0.558333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_33_collision"><pose>66.830910 13.007234 0.600100 0.000000 0.000000 0.558333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_33_ridge_0"><pose>66.807071 13.045401 0.530100 0.000000 0.000000 0.558333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_33_ridge_1"><pose>66.807071 13.045401 0.670100 0.000000 0.000000 0.558333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_34"><pose>68.604759 14.135891 0.600000 0.000000 0.000000 0.575000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_34_collision"><pose>68.604759 14.135891 0.600000 0.000000 0.000000 0.575000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_34_ridge_0"><pose>68.580286 14.173655 0.530000 0.000000 0.000000 0.575000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_34_ridge_1"><pose>68.580286 14.173655 0.670000 0.000000 0.000000 0.575000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_35"><pose>70.359551 15.293954 0.600100 0.000000 0.000000 0.591667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_35_collision"><pose>70.359551 15.293954 0.600100 0.000000 0.000000 0.591667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_35_ridge_0"><pose>70.334452 15.331304 0.530100 0.000000 0.000000 0.591667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_35_ridge_1"><pose>70.334452 15.331304 0.670100 0.000000 0.000000 0.591667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_36"><pose>72.094799 16.481101 0.600000 0.000000 0.000000 0.608333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_36_collision"><pose>72.094799 16.481101 0.600000 0.000000 0.000000 0.608333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_36_ridge_0"><pose>72.069081 16.518028 0.530000 0.000000 0.000000 0.608333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_36_ridge_1"><pose>72.069081 16.518028 0.670000 0.000000 0.000000 0.608333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_37"><pose>73.810021 17.697002 0.600100 0.000000 0.000000 0.625000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_37_collision"><pose>73.810021 17.697002 0.600100 0.000000 0.000000 0.625000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_37_ridge_0"><pose>73.783692 17.733496 0.530100 0.000000 0.000000 0.625000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_37_ridge_1"><pose>73.783692 17.733496 0.670100 0.000000 0.000000 0.625000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_38"><pose>75.504741 18.941321 0.600000 0.000000 0.000000 0.641667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_38_collision"><pose>75.504741 18.941321 0.600000 0.000000 0.000000 0.641667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_38_ridge_0"><pose>75.477807 18.977370 0.530000 0.000000 0.000000 0.641667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_38_ridge_1"><pose>75.477807 18.977370 0.670000 0.000000 0.000000 0.641667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_39"><pose>77.178488 20.213711 0.600100 0.000000 0.000000 0.658333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_39_collision"><pose>77.178488 20.213711 0.600100 0.000000 0.000000 0.658333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_39_ridge_0"><pose>77.150957 20.249306 0.530100 0.000000 0.000000 0.658333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_39_ridge_1"><pose>77.150957 20.249306 0.670100 0.000000 0.000000 0.658333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_40"><pose>78.830797 21.513818 0.600000 0.000000 0.000000 0.675000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_40_collision"><pose>78.830797 21.513818 0.600000 0.000000 0.000000 0.675000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_40_ridge_0"><pose>78.802676 21.548950 0.530000 0.000000 0.000000 0.675000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_40_ridge_1"><pose>78.802676 21.548950 0.670000 0.000000 0.000000 0.675000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_41"><pose>80.461208 22.841282 0.600100 0.000000 0.000000 0.691667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_41_collision"><pose>80.461208 22.841282 0.600100 0.000000 0.000000 0.691667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_41_ridge_0"><pose>80.432506 22.875940 0.530100 0.000000 0.000000 0.691667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_41_ridge_1"><pose>80.432506 22.875940 0.670100 0.000000 0.000000 0.691667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_42"><pose>82.069270 24.195734 0.600000 0.000000 0.000000 0.708333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_42_collision"><pose>82.069270 24.195734 0.600000 0.000000 0.000000 0.708333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_42_ridge_0"><pose>82.039995 24.229909 0.530000 0.000000 0.000000 0.708333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_42_ridge_1"><pose>82.039995 24.229909 0.670000 0.000000 0.000000 0.708333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_43"><pose>83.654536 25.576798 0.600100 0.000000 0.000000 0.725000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_43_collision"><pose>83.654536 25.576798 0.600100 0.000000 0.000000 0.725000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_43_ridge_0"><pose>83.624695 25.610480 0.530100 0.000000 0.000000 0.725000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_43_ridge_1"><pose>83.624695 25.610480 0.670100 0.000000 0.000000 0.725000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_44"><pose>85.216565 26.984090 0.600000 0.000000 0.000000 0.741667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_44_collision"><pose>85.216565 26.984090 0.600000 0.000000 0.000000 0.741667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_44_ridge_0"><pose>85.186167 27.017270 0.530000 0.000000 0.000000 0.741667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_44_ridge_1"><pose>85.186167 27.017270 0.670000 0.000000 0.000000 0.741667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_45"><pose>86.754923 28.417219 0.600100 0.000000 0.000000 0.758333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_45_collision"><pose>86.754923 28.417219 0.600100 0.000000 0.000000 0.758333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_45_ridge_0"><pose>86.723976 28.449888 0.530100 0.000000 0.000000 0.758333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_45_ridge_1"><pose>86.723976 28.449888 0.670100 0.000000 0.000000 0.758333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_46"><pose>88.269183 29.875787 0.600000 0.000000 0.000000 0.775000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_46_collision"><pose>88.269183 29.875787 0.600000 0.000000 0.000000 0.775000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_46_ridge_0"><pose>88.237696 29.907936 0.530000 0.000000 0.000000 0.775000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_46_ridge_1"><pose>88.237696 29.907936 0.670000 0.000000 0.000000 0.775000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_47"><pose>89.758924 31.359388 0.600100 0.000000 0.000000 0.791667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_47_collision"><pose>89.758924 31.359388 0.600100 0.000000 0.000000 0.791667</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_47_ridge_0"><pose>89.726906 31.391008 0.530100 0.000000 0.000000 0.791667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_47_ridge_1"><pose>89.726906 31.391008 0.670100 0.000000 0.000000 0.791667</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_48"><pose>91.223733 32.867612 0.600000 0.000000 0.000000 0.808333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_48_collision"><pose>91.223733 32.867612 0.600000 0.000000 0.000000 0.808333</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_48_ridge_0"><pose>91.191192 32.898694 0.530000 0.000000 0.000000 0.808333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_48_ridge_1"><pose>91.191192 32.898694 0.670000 0.000000 0.000000 0.808333</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_49"><pose>92.663203 34.400039 0.600100 0.000000 0.000000 0.825000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_49_collision"><pose>92.663203 34.400039 0.600100 0.000000 0.000000 0.825000</pose><geometry><box><size>2.180 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_49_ridge_0"><pose>92.630148 34.430574 0.530100 0.000000 0.000000 0.825000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_49_ridge_1"><pose>92.630148 34.430574 0.670100 0.000000 0.000000 0.825000</pose><geometry><box><size>2.180 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
 
-        <!-- Continuous W-beam 38..100 -->
-        <visual name="rail_right">
-          <pose>69 -6.15 0.60 0 0 0</pose>
-          <geometry><box><size>62 0.07 0.31</size></box></geometry>
-          <material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material>
-        </visual>
-        <collision name="rail_right_collision">
-          <pose>69 -6.15 0.60 0 0 0</pose>
-          <geometry><box><size>62 0.07 0.31</size></box></geometry>
-          <surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface>
-        </collision>
-        <visual name="rail_right_ridge_a"><pose>69 -6.105 0.53 0 0 0</pose><geometry><box><size>61.9 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
-        <visual name="rail_right_ridge_b"><pose>69 -6.105 0.67 0 0 0</pose><geometry><box><size>61.9 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <!-- Bent W-beam 34..38 m, displaced towards the road. -->
+        <visual name="rail_bent"><pose>37.211904 -0.295971 0.580000 0.120000 0.000000 0.400000</pose><geometry><box><size>3.9 0.07 0.31</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="rail_bent_collision"><pose>37.211904 -0.295971 0.580000 0.120000 0.000000 0.400000</pose><geometry><box><size>3.9 0.07 0.31</size></box></geometry><surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface></collision>
+        <visual name="rail_bent_ridge_0"><pose>37.198606 -0.252981 0.510000 0.120000 0.000000 0.400000</pose><geometry><box><size>3.8 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <visual name="rail_bent_ridge_1"><pose>37.198606 -0.252981 0.650000 0.120000 0.000000 0.400000</pose><geometry><box><size>3.8 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
 
-        <!-- Bent W-beam 34..38, displaced towards the road -->
-        <visual name="rail_bent">
-          <pose>36 -5.92 0.58 0.12 0 0.10</pose>
-          <geometry><box><size>3.9 0.07 0.31</size></box></geometry>
-          <material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material>
-        </visual>
-        <collision name="rail_bent_collision">
-          <pose>36 -5.92 0.58 0.12 0 0.10</pose>
-          <geometry><box><size>3.9 0.07 0.31</size></box></geometry>
-          <surface><friction><ode><mu>0.7</mu><mu2>0.7</mu2></ode></friction></surface>
-        </collision>
-        <visual name="rail_bent_ridge_a"><pose>36 -5.875 0.51 0.12 0 0.10</pose><geometry><box><size>3.8 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
-        <visual name="rail_bent_ridge_b"><pose>36 -5.875 0.65 0.12 0 0.10</pose><geometry><box><size>3.8 0.04 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
-
-        <!-- Posts every 4 m; none in the missing section (x=32) and the
-             bent section is supported by the displaced post at x=36. -->
-        <visual name="post_0"><pose>-8 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_0_collision"><pose>-8 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_1"><pose>-4 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_1_collision"><pose>-4 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_2"><pose>0 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_2_collision"><pose>0 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_3"><pose>4 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_3_collision"><pose>4 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_4"><pose>8 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_4_collision"><pose>8 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_5"><pose>12 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_5_collision"><pose>12 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_6"><pose>16 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_6_collision"><pose>16 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_7"><pose>20 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_7_collision"><pose>20 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_8"><pose>24 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_8_collision"><pose>24 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_9"><pose>28 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_9_collision"><pose>28 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_10"><pose>40 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_10_collision"><pose>40 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_11"><pose>44 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_11_collision"><pose>44 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_12"><pose>48 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_12_collision"><pose>48 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_13"><pose>52 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_13_collision"><pose>52 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_14"><pose>56 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_14_collision"><pose>56 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_15"><pose>60 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_15_collision"><pose>60 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_16"><pose>64 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_16_collision"><pose>64 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_17"><pose>68 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_17_collision"><pose>68 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_18"><pose>72 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_18_collision"><pose>72 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_19"><pose>76 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_19_collision"><pose>76 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_20"><pose>80 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_20_collision"><pose>80 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_21"><pose>84 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_21_collision"><pose>84 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_22"><pose>88 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_22_collision"><pose>88 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_23"><pose>92 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_23_collision"><pose>92 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_24"><pose>96 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_24_collision"><pose>96 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_25"><pose>100 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_25_collision"><pose>100 -6.25 0.375 0 0 0</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_fallen"><pose>33.0 -5.70 0.08 0 1.45 0.60</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_fallen_collision"><pose>33.0 -5.70 0.08 0 1.45 0.60</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
-        <visual name="post_bent"><pose>36 -6.03 0.34 0.18 0 0.12</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
-        <collision name="post_bent_collision"><pose>36 -6.03 0.34 0.18 0 0.12</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <!-- Posts every 4 m; s=32 is missing, s=36 is the bent post. -->
+        <visual name="post_0"><pose>-8.410433 -5.969548 0.375000 0.000000 0.000000 -0.066667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_0_collision"><pose>-8.410433 -5.969548 0.375000 0.000000 0.000000 -0.066667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_1"><pose>-4.207554 -6.179868 0.375000 0.000000 0.000000 -0.033333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_1_collision"><pose>-4.207554 -6.179868 0.375000 0.000000 0.000000 -0.033333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_2"><pose>0.000000 -6.250000 0.375000 0.000000 0.000000 0.000000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_2_collision"><pose>0.000000 -6.250000 0.375000 0.000000 0.000000 0.000000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_3"><pose>4.207554 -6.179868 0.375000 0.000000 0.000000 0.033333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_3_collision"><pose>4.207554 -6.179868 0.375000 0.000000 0.000000 0.033333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_4"><pose>8.410433 -5.969548 0.375000 0.000000 0.000000 0.066667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_4_collision"><pose>8.410433 -5.969548 0.375000 0.000000 0.000000 0.066667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_5"><pose>12.603969 -5.619276 0.375000 0.000000 0.000000 0.100000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_5_collision"><pose>12.603969 -5.619276 0.375000 0.000000 0.000000 0.100000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_6"><pose>16.783501 -5.129439 0.375000 0.000000 0.000000 0.133333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_6_collision"><pose>16.783501 -5.129439 0.375000 0.000000 0.000000 0.133333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_7"><pose>20.944387 -4.500583 0.375000 0.000000 0.000000 0.166667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_7_collision"><pose>20.944387 -4.500583 0.375000 0.000000 0.000000 0.166667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_8"><pose>25.082003 -3.733405 0.375000 0.000000 0.000000 0.200000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_8_collision"><pose>25.082003 -3.733405 0.375000 0.000000 0.000000 0.200000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_9"><pose>29.191753 -2.828759 0.375000 0.000000 0.000000 0.233333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_9_collision"><pose>29.191753 -2.828759 0.375000 0.000000 0.000000 0.233333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_10"><pose>41.308330 0.699186 0.375000 0.000000 0.000000 0.333333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_10_collision"><pose>41.308330 0.699186 0.375000 0.000000 0.000000 0.333333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_11"><pose>45.261341 2.142147 0.375000 0.000000 0.000000 0.366667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_11_collision"><pose>45.261341 2.142147 0.375000 0.000000 0.000000 0.366667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_12"><pose>49.164066 3.716050 0.375000 0.000000 0.000000 0.400000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_12_collision"><pose>49.164066 3.716050 0.375000 0.000000 0.000000 0.400000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_13"><pose>53.012169 5.419144 0.375000 0.000000 0.000000 0.433333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_13_collision"><pose>53.012169 5.419144 0.375000 0.000000 0.000000 0.433333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_14"><pose>56.801375 7.249540 0.375000 0.000000 0.000000 0.466667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_14_collision"><pose>56.801375 7.249540 0.375000 0.000000 0.000000 0.466667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_15"><pose>60.527474 9.205202 0.375000 0.000000 0.000000 0.500000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_15_collision"><pose>60.527474 9.205202 0.375000 0.000000 0.000000 0.500000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_16"><pose>64.186327 11.283957 0.375000 0.000000 0.000000 0.533333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_16_collision"><pose>64.186327 11.283957 0.375000 0.000000 0.000000 0.533333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_17"><pose>67.773868 13.483498 0.375000 0.000000 0.000000 0.566667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_17_collision"><pose>67.773868 13.483498 0.375000 0.000000 0.000000 0.566667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_18"><pose>71.286112 15.801379 0.375000 0.000000 0.000000 0.600000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_18_collision"><pose>71.286112 15.801379 0.375000 0.000000 0.000000 0.600000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_19"><pose>74.719157 18.235025 0.375000 0.000000 0.000000 0.633333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_19_collision"><pose>74.719157 18.235025 0.375000 0.000000 0.000000 0.633333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_20"><pose>78.069188 20.781733 0.375000 0.000000 0.000000 0.666667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_20_collision"><pose>78.069188 20.781733 0.375000 0.000000 0.000000 0.666667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_21"><pose>81.332483 23.438674 0.375000 0.000000 0.000000 0.700000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_21_collision"><pose>81.332483 23.438674 0.375000 0.000000 0.000000 0.700000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_22"><pose>84.505417 26.202895 0.375000 0.000000 0.000000 0.733333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_22_collision"><pose>84.505417 26.202895 0.375000 0.000000 0.000000 0.733333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_23"><pose>87.584465 29.071325 0.375000 0.000000 0.000000 0.766667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_23_collision"><pose>87.584465 29.071325 0.375000 0.000000 0.000000 0.766667</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_24"><pose>90.566206 32.040778 0.375000 0.000000 0.000000 0.800000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_24_collision"><pose>90.566206 32.040778 0.375000 0.000000 0.000000 0.800000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_25"><pose>93.447328 35.107954 0.375000 0.000000 0.000000 0.833333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_25_collision"><pose>93.447328 35.107954 0.375000 0.000000 0.000000 0.833333</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_bent"><pose>37.244412 -0.401058 0.340000 0.180000 0.000000 0.420000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_bent_collision"><pose>37.244412 -0.401058 0.340000 0.180000 0.000000 0.420000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
+        <visual name="post_fallen"><pose>34.133450 -0.976847 0.080000 0.000000 1.450000 0.875000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <collision name="post_fallen_collision"><pose>34.133450 -0.976847 0.080000 0.000000 1.450000 0.875000</pose><geometry><box><size>0.12 0.12 0.75</size></box></geometry></collision>
 
       </link>
     </model>
@@ -225,96 +622,72 @@
       <static>true</static>
       <link name="work_zone_link">
 
-        <visual name="broken_rail">
-          <pose>31.6 -5.60 0.05 0 0 0.9</pose>
-          <geometry><box><size>1.6 0.30 0.06</size></box></geometry>
-          <material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material>
-        </visual>
-        <collision name="broken_rail_collision">
-          <pose>31.6 -5.60 0.05 0 0 0.9</pose>
-          <geometry><box><size>1.6 0.30 0.06</size></box></geometry>
-        </collision>
+        <visual name="broken_rail"><pose>32.693732 -1.270276 0.050000 0.000000 0.000000 1.163333</pose><geometry><box><size>1.6 0.30 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
+        <collision name="broken_rail_collision"><pose>32.693732 -1.270276 0.050000 0.000000 0.000000 1.163333</pose><geometry><box><size>1.6 0.30 0.06</size></box></geometry></collision>
 
         <visual name="drum_0">
-          <pose>28.8 -4.05 0.42 0 0 0</pose>
+          <pose>29.487011 -0.494476 0.420000 0.000000 0.000000 0.240000</pose>
           <geometry>
             <cylinder><radius>0.20</radius><length>0.80</length></cylinder>
           </geometry>
-          <material>
-            <ambient>0.65 0.1 0.01 1</ambient>
-            <diffuse>0.98 0.28 0.02 1</diffuse>
-          </material>
+          <material><ambient>0.65 0.1 0.01 1</ambient><diffuse>0.98 0.28 0.02 1</diffuse></material>
         </visual>
         <visual name="drum_0_band">
-          <pose>28.8 -4.05 0.60 0 0 0</pose>
+          <pose>29.487011 -0.494476 0.600000 0.000000 0.000000 0.240000</pose>
           <geometry>
             <cylinder><radius>0.205</radius><length>0.12</length></cylinder>
           </geometry>
-          <material>
-            <ambient>0.85 0.85 0.82 1</ambient>
-            <diffuse>0.95 0.95 0.92 1</diffuse>
-          </material>
+          <material><ambient>0.85 0.85 0.82 1</ambient><diffuse>0.95 0.95 0.92 1</diffuse></material>
         </visual>
         <collision name="drum_0_collision">
-          <pose>28.8 -4.05 0.42 0 0 0</pose>
+          <pose>29.487011 -0.494476 0.420000 0.000000 0.000000 0.240000</pose>
           <geometry>
             <cylinder><radius>0.20</radius><length>0.80</length></cylinder>
           </geometry>
         </collision>
 
         <visual name="drum_1">
-          <pose>31.4 -4.75 0.42 0 0 0</pose>
+          <pose>32.271683 -0.503531 0.420000 0.000000 0.000000 0.261667</pose>
           <geometry>
             <cylinder><radius>0.20</radius><length>0.80</length></cylinder>
           </geometry>
-          <material>
-            <ambient>0.65 0.1 0.01 1</ambient>
-            <diffuse>0.98 0.28 0.02 1</diffuse>
-          </material>
+          <material><ambient>0.65 0.1 0.01 1</ambient><diffuse>0.98 0.28 0.02 1</diffuse></material>
         </visual>
         <visual name="drum_1_band">
-          <pose>31.4 -4.75 0.60 0 0 0</pose>
+          <pose>32.271683 -0.503531 0.600000 0.000000 0.000000 0.261667</pose>
           <geometry>
             <cylinder><radius>0.205</radius><length>0.12</length></cylinder>
           </geometry>
-          <material>
-            <ambient>0.85 0.85 0.82 1</ambient>
-            <diffuse>0.95 0.95 0.92 1</diffuse>
-          </material>
+          <material><ambient>0.85 0.85 0.82 1</ambient><diffuse>0.95 0.95 0.92 1</diffuse></material>
         </visual>
         <collision name="drum_1_collision">
-          <pose>31.4 -4.75 0.42 0 0 0</pose>
+          <pose>32.271683 -0.503531 0.420000 0.000000 0.000000 0.261667</pose>
           <geometry>
             <cylinder><radius>0.20</radius><length>0.80</length></cylinder>
           </geometry>
         </collision>
 
         <visual name="drum_2">
-          <pose>34.0 -5.45 0.42 0 0 0</pose>
+          <pose>35.070504 -0.448172 0.420000 0.000000 0.000000 0.283333</pose>
           <geometry>
             <cylinder><radius>0.20</radius><length>0.80</length></cylinder>
           </geometry>
-          <material>
-            <ambient>0.65 0.1 0.01 1</ambient>
-            <diffuse>0.98 0.28 0.02 1</diffuse>
-          </material>
+          <material><ambient>0.65 0.1 0.01 1</ambient><diffuse>0.98 0.28 0.02 1</diffuse></material>
         </visual>
         <visual name="drum_2_band">
-          <pose>34.0 -5.45 0.60 0 0 0</pose>
+          <pose>35.070504 -0.448172 0.600000 0.000000 0.000000 0.283333</pose>
           <geometry>
             <cylinder><radius>0.205</radius><length>0.12</length></cylinder>
           </geometry>
-          <material>
-            <ambient>0.85 0.85 0.82 1</ambient>
-            <diffuse>0.95 0.95 0.92 1</diffuse>
-          </material>
+          <material><ambient>0.85 0.85 0.82 1</ambient><diffuse>0.95 0.95 0.92 1</diffuse></material>
         </visual>
         <collision name="drum_2_collision">
-          <pose>34.0 -5.45 0.42 0 0 0</pose>
+          <pose>35.070504 -0.448172 0.420000 0.000000 0.000000 0.283333</pose>
           <geometry>
             <cylinder><radius>0.20</radius><length>0.80</length></cylinder>
           </geometry>
         </collision>
+
       </link>
     </model>
 
