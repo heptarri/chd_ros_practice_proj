@@ -14,6 +14,23 @@ import cv2
 import numpy as np
 
 
+def image_msg_to_bgr(msg):
+    """Convert a sensor_msgs/Image to a BGR numpy array.
+
+    Fast path for 8-bit ``rgb8`` / ``bgr8`` images (no cv_bridge, which is
+    slow for large frames); falls back to cv_bridge for other encodings.
+    """
+    if msg.encoding in ('bgr8', 'rgb8') and msg.step >= msg.width * 3:
+        data = np.frombuffer(msg.data, dtype=np.uint8)
+        arr = data.reshape(msg.height, msg.step)[:, :msg.width * 3]
+        arr = arr.reshape(msg.height, msg.width, 3)
+        if msg.encoding == 'rgb8':
+            arr = np.ascontiguousarray(arr[:, :, ::-1])  # rgb -> bgr
+        return arr
+    from cv_bridge import CvBridge
+    return CvBridge().imgmsg_to_cv2(msg, desired_encoding='bgr8')
+
+
 def default_config():
     """Default parameters, also used as ROS parameter defaults."""
     return {
@@ -48,12 +65,18 @@ def default_config():
         'sign_slow_duration': 3.0,
         'sign_slow_speed': 1.0,
         'sign_cooldown': 6.0,
+        # Detection runs on a downscaled image (1.0 = full resolution) to
+        # lighten the per-frame CPU load.
+        'detect_scale': 0.5,
         'debug': False,
     }
 
 
-def detect_and_steer(frame_bgr, cfg):
+def detect_and_steer(frame_bgr, cfg, hsv=None):
     """Detect the right edge line and compute a Twist command.
+
+    ``hsv`` may be precomputed by the caller to avoid a redundant colour
+    conversion when several detectors run on the same frame.
 
     Returns a dict with v, w, error, lateral, x, row, slope, mask and an
     optional debug overlay, or None when no trustworthy line was found.
@@ -75,7 +98,7 @@ def detect_and_steer(frame_bgr, cfg):
     roi = np.zeros((h, w), dtype=np.uint8)
     roi[y0:y1, x0:x1] = 255
 
-    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV) if hsv is None else hsv
     white = cv2.inRange(
         hsv,
         (0, 0, int(cfg['white_v_min'])),
@@ -164,16 +187,18 @@ def detect_and_steer(frame_bgr, cfg):
     }
 
 
-def detect_sign(frame_bgr, cfg):
+def detect_sign(frame_bgr, cfg, hsv=None):
     """Detect a yellow or blue road sign in the camera image.
 
     Returns {'type': 'yellow'|'blue', 'area': n_pixels} or None.  Only highly
     saturated colours are matched, so the grey road, white lines and the
     pale-blue sky are ignored.
     """
-    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV) if hsv is None else hsv
 
-    yellow = cv2.inRange(hsv, (20, 120, 120), (35, 255, 255))
+    # Wide yellow range: the sign is amber/gold and lit/shaded differently in
+    # the scene, so accept a broad hue/sat/value window.  Blue stays narrow.
+    yellow = cv2.inRange(hsv, (15, 60, 60), (45, 255, 255))
     blue = cv2.inRange(hsv, (100, 120, 80), (130, 255, 255))
 
     yellow_area = int(cv2.countNonZero(yellow))
@@ -210,34 +235,56 @@ class SignFollower:
     def update(self, frame, cfg):
         now = time.monotonic()
 
+        # Run the detectors on a downscaled image and share a single HSV
+        # conversion between them -- the detection math is scale-invariant, so
+        # this is much cheaper without changing the control behaviour.
+        scale = float(cfg.get('detect_scale', 1.0))
+        if scale < 1.0:
+            f = cv2.resize(
+                frame,
+                (int(frame.shape[1] * scale), int(frame.shape[0] * scale)),
+                interpolation=cv2.INTER_AREA)
+            area = scale * scale
+            local_cfg = dict(cfg)
+            local_cfg['min_pixels'] = max(20, int(cfg['min_pixels'] * area))
+            local_cfg['sign_min_area'] = max(50, int(cfg['sign_min_area'] * area))
+        else:
+            f = frame
+            local_cfg = cfg
+
+        hsv = cv2.cvtColor(f, cv2.COLOR_BGR2HSV)
+
         sign = None
         if now >= self.cooldown_until:
-            sign = detect_sign(frame, cfg)
+            sign = detect_sign(f, local_cfg, hsv)
 
         # A stop / slow behaviour is still running.
         if self.state in ('stop', 'slow') and now < self.until:
             if self.state == 'stop':
                 return (0.0, 0.0, '黄色路标：停止中…', None)
-            res = detect_and_steer(frame, cfg)
+            res = detect_and_steer(f, local_cfg, hsv)
             if res is None:
                 return (0.0, 0.0, '蓝色路标：减速中（线丢失）…', None)
-            return (cfg['sign_slow_speed'], res['w'], '蓝色路标：减速中…', res)
+            return (local_cfg['sign_slow_speed'], res['w'],
+                    '蓝色路标：减速中…', res)
 
         if self.state != 'follow':
             self.state = 'follow'  # timer expired, back to normal
 
-        res = detect_and_steer(frame, cfg)
+        res = detect_and_steer(f, local_cfg, hsv)
 
         if sign is not None:
             if sign['type'] == 'yellow':
                 self.state = 'stop'
                 self.until = now + cfg['sign_stop_duration']
-                self.cooldown_until = now + cfg['sign_stop_duration'] + cfg['sign_cooldown']
+                self.cooldown_until = (now + cfg['sign_stop_duration']
+                                       + cfg['sign_cooldown'])
                 self.last_sign = 'yellow'
                 return (0.0, 0.0, '检测到黄色路标：停止 3 秒…', res)
             self.state = 'slow'
             self.until = now + cfg['sign_slow_duration']
-            self.cooldown_until = now + cfg['sign_slow_duration'] + cfg['sign_cooldown']
+            self.cooldown_until = (now + cfg['sign_slow_duration']
+                                   + cfg['sign_cooldown'])
             self.last_sign = 'blue'
             w = res['w'] if res is not None else 0.0
             return (cfg['sign_slow_speed'], w, '检测到蓝色路标：减速…', res)

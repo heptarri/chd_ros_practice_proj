@@ -32,7 +32,7 @@ from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from line_following import SignFollower, default_config, detect_and_steer
+from line_following import SignFollower, default_config, image_msg_to_bgr
 
 
 class LineFollower(Node):
@@ -71,7 +71,7 @@ class LineFollower(Node):
 
     def on_image(self, msg):
         try:
-            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            frame = image_msg_to_bgr(msg)
         except Exception as exc:  # cv_bridge raises CvBridgeError
             self.get_logger().error(f'cv_bridge conversion failed: {exc}')
             return

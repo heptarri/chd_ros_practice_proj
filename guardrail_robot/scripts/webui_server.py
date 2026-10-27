@@ -41,7 +41,7 @@ from sensor_msgs.msg import PointCloud2
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rail_damage
-from line_following import SignFollower, default_config, detect_and_steer
+from line_following import SignFollower, default_config, image_msg_to_bgr
 
 
 class WebUiServer(Node):
@@ -108,7 +108,7 @@ class WebUiServer(Node):
     def on_image(self, msg):
         self.last_image_time = time.monotonic()
         try:
-            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+            frame = image_msg_to_bgr(msg)
         except Exception as exc:
             self.get_logger().error(f'cv_bridge failed: {exc}')
             return

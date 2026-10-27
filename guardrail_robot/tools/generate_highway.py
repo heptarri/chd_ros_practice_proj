@@ -222,7 +222,9 @@ def build_work_zone():
 
 def build_signs():
     # Road signs on the right shoulder: a post plus a coloured panel facing
-    # the road.  Yellow = stop, blue = slow down (see SIGNS above).
+    # oncoming traffic.  The panel is thin along the road (x) and wide across
+    # it (y), so its face is perpendicular to the driving direction -- the car
+    # sees it head-on.  Yellow = stop, blue = slow down (see SIGNS above).
     out = []
     for s, kind in SIGNS:
         name = f'{kind}_sign_{int(s)}'
@@ -230,7 +232,7 @@ def build_signs():
         out.append(box_visual(f'{name}_post', pose(s, SIGN_D, 0.9),
                               '0.10 0.10 1.80', MAT_POST))
         out.append(box_visual(name, pose(s, SIGN_D, 1.7),
-                              '0.80 0.08 0.60', mat))
+                              '0.08 0.80 0.60', mat))
     return ''.join(out)
 
 
