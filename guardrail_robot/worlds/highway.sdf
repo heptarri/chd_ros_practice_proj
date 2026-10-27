@@ -14,6 +14,8 @@
     * W-beam guardrail at the outer edge of the shoulder:
       0.31 m beam, top at 0.755 m, posts every 4 m
     * damage zone around 30-38 m: missing / bent rail and a fallen post
+    * road signs on the right shoulder: blue (slow) at 70 m, yellow (stop)
+      at 110 m
 
   Axes: +x forward, +y left, +z up.
   Arc: centre at (0, 120); the spawn point is the origin heading +x, with
@@ -935,6 +937,19 @@
 
         <visual name="broken_rail"><pose>32.693732 -1.270276 0.050000 0.000000 0.000000 1.163333</pose><geometry><box><size>1.6 0.30 0.06</size></box></geometry><material><ambient>0.44 0.47 0.5 1</ambient><diffuse>0.68 0.72 0.75 1</diffuse></material></visual>
         <collision name="broken_rail_collision"><pose>32.693732 -1.270276 0.050000 0.000000 0.000000 1.163333</pose><geometry><box><size>1.6 0.30 0.06</size></box></geometry></collision>
+
+      </link>
+    </model>
+
+    <!-- ==================== Road signs ==================== -->
+    <model name="road_signs">
+      <static>true</static>
+      <link name="road_signs_link">
+
+        <visual name="blue_sign_70_post"><pose>69.016380 15.420703 0.900000 0.000000 0.000000 0.583333</pose><geometry><box><size>0.10 0.10 1.80</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <visual name="blue_sign_70"><pose>69.016380 15.420703 1.700000 0.000000 0.000000 0.583333</pose><geometry><box><size>0.80 0.08 0.60</size></box></geometry><material><ambient>0.0 0.18 0.5 1</ambient><diffuse>0.0 0.35 0.95 1</diffuse></material></visual>
+        <visual name="yellow_sign_110_post"><pose>99.435299 43.758860 0.900000 0.000000 0.000000 0.916667</pose><geometry><box><size>0.10 0.10 1.80</size></box></geometry><material><ambient>0.25 0.27 0.29 1</ambient><diffuse>0.42 0.44 0.46 1</diffuse></material></visual>
+        <visual name="yellow_sign_110"><pose>99.435299 43.758860 1.700000 0.000000 0.000000 0.916667</pose><geometry><box><size>0.80 0.08 0.60</size></box></geometry><material><ambient>0.55 0.45 0.0 1</ambient><diffuse>1.0 0.85 0.0 1</diffuse></material></visual>
 
       </link>
     </model>

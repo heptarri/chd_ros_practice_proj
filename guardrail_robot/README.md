@@ -116,6 +116,21 @@ ros2 launch guardrail_robot webui.launch.py
 
 - 端口默认 8000，可改：`ros2 launch guardrail_robot webui.launch.py port:=9000`。
 
+## 路标识别（黄 / 蓝）
+
+地图右侧路肩上有两块彩色路标（见 `tools/generate_highway.py` 里的 `SIGNS`）：
+
+* **蓝色路标**（约 70 m）：代表需要减速，减速 3 秒后重新加速；
+* **黄色路标**（约 110 m）：代表停车，停止 3 秒后继续。
+
+识别逻辑在 `scripts/line_following.py` 的 `detect_sign()`（HSV 颜色分割，只匹配高饱和
+的黄/蓝，忽略灰路面、白线和淡蓝天）和 `SignFollower`（状态机：停车/减速 + 冷却，避免
+同一块路标反复触发）。寻迹节点、PyQt 控制台、Web UI 的寻迹模式都复用这套逻辑。
+
+相关参数可用 `--ros-args -p ...` 调整：`sign_min_area`（触发面积）、
+`sign_stop_duration`（黄标停车时长，默认 3 s）、`sign_slow_duration` /
+`sign_slow_speed`（蓝标减速时长/速度，默认 3 s / 1 m/s）、`sign_cooldown`（冷却）。
+
 ## 护栏破损检测（激光雷达）
 
 `scripts/rail_damage.py` 用三维激光雷达点云（`/scan/points`）识别右侧护栏的破损

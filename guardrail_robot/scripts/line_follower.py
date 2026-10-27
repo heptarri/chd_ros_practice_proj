@@ -32,7 +32,7 @@ from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from line_following import default_config, detect_and_steer
+from line_following import SignFollower, default_config, detect_and_steer
 
 
 class LineFollower(Node):
@@ -48,7 +48,8 @@ class LineFollower(Node):
         self.bridge = CvBridge()
         self.cmd = Twist()
         self.last_image_time = 0.0
-        self.last_lost_log = 0.0
+        self.last_status_log = 0.0
+        self.sf = SignFollower(self.cfg)
 
         self.create_subscription(
             Image, self.cfg['image_topic'], self.on_image,
@@ -76,21 +77,17 @@ class LineFollower(Node):
             return
 
         self.last_image_time = time.monotonic()
-        result = detect_and_steer(frame, self.cfg)
+        v, w, status, result = self.sf.update(frame, self.cfg)
+        self.cmd.linear.x = v
+        self.cmd.angular.z = w
 
-        if result is None:
-            # Losing the solid edge line means we should not keep driving.
-            self.cmd = Twist()
-            now = time.monotonic()
-            if now - self.last_lost_log > 1.0:
-                self.get_logger().warn('road line lost, stopping')
-                self.last_lost_log = now
-            return
+        now = time.monotonic()
+        if now - self.last_status_log > 1.0:
+            self.get_logger().info(f'sign follower: {status}')
+            self.last_status_log = now
 
-        self.cmd.linear.x = result['v']
-        self.cmd.angular.z = result['w']
-
-        if self.debug_pub is not None and result['overlay'] is not None:
+        if (self.debug_pub is not None and result is not None
+                and result['overlay'] is not None):
             debug = self.bridge.cv2_to_imgmsg(result['overlay'], encoding='bgr8')
             debug.header = msg.header
             self.debug_pub.publish(debug)

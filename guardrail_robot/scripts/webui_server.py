@@ -41,7 +41,7 @@ from sensor_msgs.msg import PointCloud2
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rail_damage
-from line_following import default_config, detect_and_steer
+from line_following import SignFollower, default_config, detect_and_steer
 
 
 class WebUiServer(Node):
@@ -68,6 +68,7 @@ class WebUiServer(Node):
             self.det_cfg[name] = self.get_parameter(name).value
 
         self.cam = rail_damage.make_camera_projection(self.cfg)
+        self.sf = SignFollower(self.cfg)
         self.bridge = CvBridge()
 
         self.mode = 'manual'
@@ -114,17 +115,10 @@ class WebUiServer(Node):
 
         with self.state_lock:
             if self.mode == 'follow':
-                result = detect_and_steer(frame, self.cfg)
-                if result is None:
-                    self.twist = Twist()
-                    self.follow_status = '丢失车道线，已停车'
-                else:
-                    self.twist.linear.x = result['v']
-                    self.twist.angular.z = result['w']
-                    self.follow_status = (
-                        f"偏移 {result['lateral']:+.2f} m "
-                        f"误差 {result['error']:+.2f} m "
-                        f"速度 {result['v']:.1f} m/s")
+                v, w, status, _ = self.sf.update(frame, self.cfg)
+                self.twist.linear.x = v
+                self.twist.angular.z = w
+                self.follow_status = status
 
         self._draw_damage(frame)
         ok, buf = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 70])
@@ -171,6 +165,7 @@ class WebUiServer(Node):
             if 'mode' in cmd and cmd['mode'] in ('manual', 'follow'):
                 self.mode = cmd['mode']
                 self.twist = Twist()
+                self.sf.reset()
                 self.follow_status = ('手动控制模式' if self.mode == 'manual'
                                       else '等待摄像头…')
             if cmd.get('stop'):

@@ -29,6 +29,13 @@ ASPHALT_D = -1.25    # carriageway + shoulder centre offset
 RAIL_D = -6.15
 POST_D = -6.25
 
+SIGN_D = -5.3        # road signs sit on the right shoulder
+# Road signs: (arc length [m], colour).  Yellow = stop, blue = slow down.
+SIGNS = [
+    (70.0, 'blue'),
+    (110.0, 'yellow'),
+]
+
 STEP = 2.0           # chord length used for road furniture
 
 MAT_ROAD = ('<material><ambient>0.055 0.058 0.062 1</ambient>'
@@ -39,6 +46,10 @@ MAT_RAIL = ('<material><ambient>0.44 0.47 0.5 1</ambient>'
             '<diffuse>0.68 0.72 0.75 1</diffuse></material>')
 MAT_POST = ('<material><ambient>0.25 0.27 0.29 1</ambient>'
             '<diffuse>0.42 0.44 0.46 1</diffuse></material>')
+MAT_YELLOW = ('<material><ambient>0.55 0.45 0.0 1</ambient>'
+              '<diffuse>1.0 0.85 0.0 1</diffuse></material>')
+MAT_BLUE = ('<material><ambient>0.0 0.18 0.5 1</ambient>'
+            '<diffuse>0.0 0.35 0.95 1</diffuse></material>')
 
 FRICTION_ROAD = ('<surface><friction><ode><mu>0.95</mu><mu2>0.95</mu2>'
                  '</ode></friction></surface>')
@@ -209,6 +220,20 @@ def build_work_zone():
     return ''.join(out)
 
 
+def build_signs():
+    # Road signs on the right shoulder: a post plus a coloured panel facing
+    # the road.  Yellow = stop, blue = slow down (see SIGNS above).
+    out = []
+    for s, kind in SIGNS:
+        name = f'{kind}_sign_{int(s)}'
+        mat = MAT_YELLOW if kind == 'yellow' else MAT_BLUE
+        out.append(box_visual(f'{name}_post', pose(s, SIGN_D, 0.9),
+                              '0.10 0.10 1.80', MAT_POST))
+        out.append(box_visual(name, pose(s, SIGN_D, 1.7),
+                              '0.80 0.08 0.60', mat))
+    return ''.join(out)
+
+
 def main():
     angle_deg = math.degrees((S_END - S_START) / R)
     length = S_END - S_START
@@ -229,6 +254,8 @@ def main():
     * W-beam guardrail at the outer edge of the shoulder:
       0.31 m beam, top at 0.755 m, posts every 4 m
     * damage zone around 30-38 m: missing / bent rail and a fallen post
+    * road signs on the right shoulder: blue (slow) at 70 m, yellow (stop)
+      at 110 m
 
   Axes: +x forward, +y left, +z up.
   Arc: centre at (0, {R:.0f}); the spawn point is the origin heading +x, with
@@ -296,6 +323,12 @@ def main():
         '      <static>true</static>\n'
         '      <link name="work_zone_link">\n\n' +
         build_work_zone() +
+        '\n      </link>\n    </model>\n'
+        '\n    <!-- ==================== Road signs ==================== -->\n'
+        '    <model name="road_signs">\n'
+        '      <static>true</static>\n'
+        '      <link name="road_signs_link">\n\n' +
+        build_signs() +
         '\n      </link>\n    </model>\n'
         '\n  </world>\n</sdf>\n'
     )

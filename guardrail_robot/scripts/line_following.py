@@ -8,6 +8,7 @@ or the control law.
 """
 
 import math
+import time
 
 import cv2
 import numpy as np
@@ -40,6 +41,13 @@ def default_config():
         'image_topic': '/camera/image_raw',
         'cmd_topic': '/cmd_vel',
         'lost_timeout': 0.6,
+        # Road signs (coloured panels on the shoulder): yellow = stop for a
+        # few seconds, blue = slow down then accelerate again.
+        'sign_min_area': 800,
+        'sign_stop_duration': 3.0,
+        'sign_slow_duration': 3.0,
+        'sign_slow_speed': 1.0,
+        'sign_cooldown': 6.0,
         'debug': False,
     }
 
@@ -154,3 +162,87 @@ def detect_and_steer(frame_bgr, cfg):
         'mask': mask,
         'overlay': overlay,
     }
+
+
+def detect_sign(frame_bgr, cfg):
+    """Detect a yellow or blue road sign in the camera image.
+
+    Returns {'type': 'yellow'|'blue', 'area': n_pixels} or None.  Only highly
+    saturated colours are matched, so the grey road, white lines and the
+    pale-blue sky are ignored.
+    """
+    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
+
+    yellow = cv2.inRange(hsv, (20, 120, 120), (35, 255, 255))
+    blue = cv2.inRange(hsv, (100, 120, 80), (130, 255, 255))
+
+    yellow_area = int(cv2.countNonZero(yellow))
+    blue_area = int(cv2.countNonZero(blue))
+    threshold = cfg['sign_min_area']
+
+    if yellow_area >= threshold and yellow_area >= blue_area:
+        return {'type': 'yellow', 'area': yellow_area}
+    if blue_area >= threshold and blue_area > yellow_area:
+        return {'type': 'blue', 'area': blue_area}
+    return None
+
+
+class SignFollower:
+    """Line following plus road-sign behaviour.
+
+    Yellow sign -> stop for ``sign_stop_duration`` seconds.
+    Blue sign   -> slow down for ``sign_slow_duration`` seconds, then resume.
+
+    ``update()`` returns (v, w, status, result) where ``result`` is the raw
+    ``detect_and_steer`` output (or None).
+    """
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+        self.reset()
+
+    def reset(self):
+        self.state = 'follow'        # follow | stop | slow
+        self.until = 0.0             # monotonic deadline for stop/slow
+        self.cooldown_until = 0.0    # ignore signs until this time
+        self.last_sign = None
+
+    def update(self, frame, cfg):
+        now = time.monotonic()
+
+        sign = None
+        if now >= self.cooldown_until:
+            sign = detect_sign(frame, cfg)
+
+        # A stop / slow behaviour is still running.
+        if self.state in ('stop', 'slow') and now < self.until:
+            if self.state == 'stop':
+                return (0.0, 0.0, '黄色路标：停止中…', None)
+            res = detect_and_steer(frame, cfg)
+            if res is None:
+                return (0.0, 0.0, '蓝色路标：减速中（线丢失）…', None)
+            return (cfg['sign_slow_speed'], res['w'], '蓝色路标：减速中…', res)
+
+        if self.state != 'follow':
+            self.state = 'follow'  # timer expired, back to normal
+
+        res = detect_and_steer(frame, cfg)
+
+        if sign is not None:
+            if sign['type'] == 'yellow':
+                self.state = 'stop'
+                self.until = now + cfg['sign_stop_duration']
+                self.cooldown_until = now + cfg['sign_stop_duration'] + cfg['sign_cooldown']
+                self.last_sign = 'yellow'
+                return (0.0, 0.0, '检测到黄色路标：停止 3 秒…', res)
+            self.state = 'slow'
+            self.until = now + cfg['sign_slow_duration']
+            self.cooldown_until = now + cfg['sign_slow_duration'] + cfg['sign_cooldown']
+            self.last_sign = 'blue'
+            w = res['w'] if res is not None else 0.0
+            return (cfg['sign_slow_speed'], w, '检测到蓝色路标：减速…', res)
+
+        if res is None:
+            return (0.0, 0.0, '丢失车道线，已停车', None)
+        return (res['v'], res['w'],
+                f"寻迹 v={res['v']:.1f} 偏移 {res['lateral']:+.2f}", res)

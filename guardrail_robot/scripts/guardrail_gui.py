@@ -41,7 +41,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rail_damage
-from line_following import default_config, detect_and_steer
+from line_following import SignFollower, default_config, detect_and_steer
 
 
 class CameraView(QtWidgets.QLabel):
@@ -180,6 +180,7 @@ class GuardrailWindow(QtWidgets.QMainWindow):
         self.node = node
         self.cfg = self._read_params()
         self.cam = rail_damage.make_camera_projection(self.cfg)
+        self.sf = SignFollower(self.cfg)
         self.damage = {'found': False, 'x': 0.0, 'length': 0.0,
                        'rail_y': -4.3, 'stamp': 0.0}
         self.damage_point = None
@@ -310,6 +311,7 @@ class GuardrailWindow(QtWidgets.QMainWindow):
             self.mode = 'line_follow'
             self.steering.setEnabled(False)
             self.twist = Twist()
+            self.sf.reset()
             self.follow_status.setText('寻迹模式：等待摄像头画面…')
 
     def _on_manual(self, linear, angular):
@@ -331,18 +333,10 @@ class GuardrailWindow(QtWidgets.QMainWindow):
             return
 
         if self.mode == 'line_follow':
-            result = detect_and_steer(frame, self.cfg)
-            if result is None:
-                self.twist = Twist()
-                self.follow_status.setText('丢失车道线，已停车')
-            else:
-                self.twist.linear.x = result['v']
-                self.twist.angular.z = result['w']
-                self.follow_status.setText(
-                    f"寻迹中：横向偏移 {result['lateral']:+.2f} m，"
-                    f"误差 {result['error']:+.2f} m，"
-                    f"速度 {result['v']:.1f} m/s，"
-                    f"角速度 {result['w']:+.2f} rad/s")
+            v, w, status, _ = self.sf.update(frame, self.cfg)
+            self.twist.linear.x = v
+            self.twist.angular.z = w
+            self.follow_status.setText(status)
 
         self._draw_damage(frame)
 
