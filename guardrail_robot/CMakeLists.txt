@@ -9,6 +9,7 @@ install(DIRECTORY
   launch
   config
   rviz
+  web
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -18,6 +19,7 @@ install(PROGRAMS
   scripts/line_following.py
   scripts/rail_damage.py
   scripts/guardrail_gui.py
+  scripts/webui_server.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -97,6 +97,25 @@ ros2 run guardrail_robot guardrail_gui --ros-args -p speed:=2.0
 sudo apt install fonts-noto-cjk        # 或 fonts-wqy-microhei
 ```
 
+## Web UI（React）
+
+`scripts/webui_server.py` 把上面的 PyQt 控制台移植成了浏览器页面：后端仍是 ROS 节点
+（摄像头、寻迹、护栏破损检测、`/cmd_vel` 发布都在后端），前端用 React 编写，通过
+SSE 接收画面与状态、通过 HTTP 发送控制命令。静态页面在 `web/`（React 18 + Babel
+内联编译，无需 Node/npm 构建）。
+
+```bash
+# 先启动仿真（关掉默认 rqt 遥控）
+ros2 launch guardrail_robot sim.launch.py teleop:=false
+# 再启动 web 服务
+ros2 launch guardrail_robot webui.launch.py
+```
+
+浏览器打开 <http://localhost:8000> 即可看到摄像头画面、控制模式切换、手动摇杆
+（Linear x / Angular z）、急停、护栏破损提示。
+
+- 端口默认 8000，可改：`ros2 launch guardrail_robot webui.launch.py port:=9000`。
+
 ## 护栏破损检测（激光雷达）
 
 `scripts/rail_damage.py` 用三维激光雷达点云（`/scan/points`）识别右侧护栏的破损
