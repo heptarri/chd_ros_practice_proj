@@ -97,6 +97,26 @@ ros2 run guardrail_robot guardrail_gui --ros-args -p speed:=2.0
 sudo apt install fonts-noto-cjk        # 或 fonts-wqy-microhei
 ```
 
+## 护栏破损检测（激光雷达）
+
+`scripts/rail_damage.py` 用三维激光雷达点云（`/scan/points`）识别右侧护栏的破损
+（不连续）。原理：取护栏梁高度带的点、只保留车辆右侧、用这些点的中位横向位置
+估计护栏位置，再沿车辆前进方向做直方图，出现一段两侧都有护栏、长度超过阈值
+（默认 2.5 m）的空档即判定为破损。
+
+GUI 会：
+
+* 在右侧 **护栏检测 / Guardrail** 栏提示：`护栏连续 ✓`（绿）或
+  `⚠ 发现护栏破损（前方 X m）`（红）；
+* 在摄像头画面上把破损位置用红框标出；当破损暂时超出相机视野时，在画面右缘
+  显示红色提示条。
+
+检测参数（`z_min/z_max`、`min_gap`、`bin_size` 等）都可通过 ROS 参数覆盖，例如：
+
+```bash
+ros2 run guardrail_robot guardrail_gui --ros-args -p min_gap:=3.0
+```
+
 ## 用 rqt_robot_steering 遥控
 
 `sim.launch.py` 已经启动了一个配置好的 `rqt_robot_steering` 窗口，直接拖动

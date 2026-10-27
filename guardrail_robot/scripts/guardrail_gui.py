@@ -5,6 +5,10 @@ The window shows the front camera feed on the left and, on the right, a mode
 selector (line following vs. manual driving) plus an rqt_robot_steering-style
 joystick made of two vertical sliders (``Linear x`` and ``Angular z``).
 
+It also subscribes to the 3D LiDAR (``/scan/points``) and flags a broken
+right-hand guardrail: a status line in the right panel and a marker drawn on
+the camera image (see ``rail_damage.py``).
+
 Modes
 -----
 * Manual: the two sliders publish ``geometry_msgs/msg/Twist`` on ``/cmd_vel``.
@@ -24,6 +28,7 @@ import signal
 import sys
 import time
 
+import cv2
 import rclpy
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Twist
@@ -31,9 +36,11 @@ from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import PointCloud2
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rail_damage
 from line_following import default_config, detect_and_steer
 
 
@@ -172,6 +179,10 @@ class GuardrailWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.node = node
         self.cfg = self._read_params()
+        self.cam = rail_damage.make_camera_projection(self.cfg)
+        self.damage = {'found': False, 'x': 0.0, 'length': 0.0,
+                       'rail_y': -4.3, 'stamp': 0.0}
+        self.damage_point = None
         self.bridge = CvBridge()
         self.twist = Twist()
         self.last_image_time = 0.0
@@ -188,9 +199,18 @@ class GuardrailWindow(QtWidgets.QMainWindow):
             self.node.declare_parameter(name, value)
             cfg[name] = self.node.get_parameter(name).value
         for name, value in (('vx_min', -4.0), ('vx_max', 12.0),
-                            ('vw_min', -3.0), ('vw_max', 3.0)):
+                            ('vw_min', -3.0), ('vw_max', 3.0),
+                            ('image_width', 640), ('image_height', 480),
+                            ('camera_x', 2.36), ('camera_y', 0.0),
+                            ('camera_z', 0.025)):
             self.node.declare_parameter(name, value)
             cfg[name] = self.node.get_parameter(name).value
+
+        det = rail_damage.default_detection_config()
+        for name, value in det.items():
+            self.node.declare_parameter(name, value)
+            det[name] = self.node.get_parameter(name).value
+        self.det_cfg = det
         return cfg
 
     def _build_ros(self):
@@ -199,6 +219,9 @@ class GuardrailWindow(QtWidgets.QMainWindow):
             qos_profile_sensor_data)
         self.cmd_pub = self.node.create_publisher(
             Twist, self.cfg['cmd_topic'], 10)
+        self.cloud_sub = self.node.create_subscription(
+            PointCloud2, self.det_cfg['scan_topic'], self._on_cloud,
+            qos_profile_sensor_data)
 
     def _build_timers(self):
         self.publish_timer = QtCore.QTimer(self)
@@ -238,6 +261,12 @@ class GuardrailWindow(QtWidgets.QMainWindow):
         mode_layout.addWidget(self.rb_follow)
         mode_layout.addWidget(self.rb_manual)
 
+        rail_box = QtWidgets.QGroupBox('护栏检测 / Guardrail')
+        rail_layout = QtWidgets.QVBoxLayout(rail_box)
+        self.rail_status = QtWidgets.QLabel('护栏检测中…')
+        self.rail_status.setWordWrap(True)
+        rail_layout.addWidget(self.rail_status)
+
         steer_box = QtWidgets.QGroupBox('手动摇杆 / Steering')
         steer_layout = QtWidgets.QVBoxLayout(steer_box)
         self.steering = SteeringJoystick(
@@ -257,6 +286,7 @@ class GuardrailWindow(QtWidgets.QMainWindow):
         side = QtWidgets.QVBoxLayout()
         side.setSpacing(12)
         side.addWidget(mode_box)
+        side.addWidget(rail_box)
         side.addWidget(steer_box, stretch=1)
         side.addWidget(status_box)
 
@@ -314,10 +344,79 @@ class GuardrailWindow(QtWidgets.QMainWindow):
                     f"速度 {result['v']:.1f} m/s，"
                     f"角速度 {result['w']:+.2f} rad/s")
 
+        self._draw_damage(frame)
+
         h, w = frame.shape[:2]
         image = QtGui.QImage(frame.data, w, h, frame.strides[0],
                              QtGui.QImage.Format_BGR888).copy()
         self.camera.set_image(image)
+
+    def _on_cloud(self, msg):
+        points = rail_damage.cloud_to_xyz(msg)
+        result = rail_damage.detect_rail_gap(points, self.det_cfg)
+        now = time.monotonic()
+
+        if result is None:
+            self.damage['stamp'] = now
+            self.damage['found'] = False
+            self.damage_point = None
+            self._set_rail_status('unknown', 0.0)
+            return
+
+        self.damage['found'] = result['found']
+        self.damage['x'] = result['x']
+        self.damage['length'] = result['length']
+        self.damage['rail_y'] = result['rail_y']
+        self.damage['stamp'] = now
+
+        if result['found']:
+            # Mark the gap at the W-beam centre height in the base_link frame.
+            self.damage_point = (result['x'], result['rail_y'], -0.175)
+            self._set_rail_status('damage', result['x'])
+        else:
+            self.damage_point = None
+            self._set_rail_status('ok', 0.0)
+
+    def _set_rail_status(self, state, distance):
+        if state == 'damage':
+            where = '前方' if distance >= 0 else '后方'
+            self.rail_status.setText(
+                f'<span style="color:#e74c3c; font-weight:bold;">'
+                f'⚠ 发现护栏破损（{where} {abs(distance):.1f} m）</span>')
+        elif state == 'ok':
+            self.rail_status.setText(
+                '<span style="color:#2ecc71;">护栏连续 ✓</span>')
+        else:
+            self.rail_status.setText(
+                '<span style="color:#8b96a5;">护栏检测中…</span>')
+
+    def _draw_damage(self, frame):
+        if not self.damage['found'] or self.damage_point is None:
+            return
+        if time.monotonic() - self.damage['stamp'] > 1.0:
+            return
+        h, w = frame.shape[:2]
+
+        # Only mark it when the gap is still in front of the camera.
+        if self.damage['x'] >= 2.36:
+            pixel = rail_damage.project_to_pixel(self.damage_point, self.cam)
+            if pixel is not None:
+                u = int(round(pixel[0]))
+                v = int(round(pixel[1]))
+                if 0 <= u < w and 0 <= v < h:
+                    cv2.rectangle(frame, (u - 24, v - 16), (u + 24, v + 16),
+                                  (0, 0, 255), 2)
+                    cv2.putText(frame, 'DAMAGE', (u - 22, v - 22),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 255),
+                                2, cv2.LINE_AA)
+                    return
+
+            # Detected but just outside the camera field of view: show a
+            # marker pinned to the right edge (the guardrail is on the right).
+            cv2.rectangle(frame, (w - 12, 0), (w, h), (0, 0, 255), -1)
+            cv2.putText(frame, f'DAMAGE {self.damage["x"]:+.1f}m',
+                        (w - 190, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                        (0, 0, 255), 2, cv2.LINE_AA)
 
     def _on_publish(self):
         # Watchdog: stop if line following but the camera went silent.
