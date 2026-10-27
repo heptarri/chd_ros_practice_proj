@@ -10,7 +10,7 @@ bridge never forwards the command and the robot does not move.
 
 This launch file starts rqt_robot_steering with a private configuration
 directory that already contains the right settings (``/cmd_vel``, unstamped,
-10 m/s / 2 rad/s slider range), so the controls work without touching the
+12 m/s / 3 rad/s slider range), so the controls work without touching the
 user's global rqt configuration.  It uses the small wrapper in
 ``scripts/rqt_robot_steering_guardrail`` to work around a float/int bug in
 rqt_robot_steering 1.0.3 that otherwise keeps the sliders pinned to +/-1 m/s.

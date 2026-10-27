@@ -63,11 +63,45 @@ ros2 launch guardrail_robot sim.launch.py
 ros2 launch guardrail_robot sim.launch.py rviz:=false teleop:=false
 ```
 
+## PyQt 控制台（摄像头 + 模式 + 摇杆）
+
+`scripts/guardrail_gui.py` 是一个 PyQt5 控制面板，左边显示摄像头实时画面，右边
+提供：
+
+* **控制模式**：`寻迹 (line following)` / `手动控制 (manual)` 单选切换；
+* **手动摇杆**：与 `rqt_robot_steering` 同款的 `Linear x` / `Angular z` 两个
+  竖直滑块（范围 −4…12 m/s、−3…3 rad/s），外加一个 **急停 / Stop** 按钮。
+
+寻迹模式复用 `line_follower.py` 同一套检测/控制逻辑（抽到
+`scripts/line_following.py`），因此面板可以单独完成寻迹；手动模式则由摇杆直接
+往 `/cmd_vel` 发布 `Twist`。
+
+启动时先关掉默认的 rqt 遥控，避免两个 `/cmd_vel` 发布者冲突：
+
+```bash
+ros2 launch guardrail_robot sim.launch.py teleop:=false
+ros2 launch guardrail_robot gui.launch.py
+```
+
+也可以直接运行，或用 ROS 参数覆盖寻迹速度：
+
+```bash
+ros2 run guardrail_robot guardrail_gui
+ros2 run guardrail_robot guardrail_gui --ros-args -p speed:=2.0
+```
+
+界面中文需要系统装有中文字体（程序会自动选用 Noto CJK / 文泉驿等）。若显示为
+方框，安装中文字体即可：
+
+```bash
+sudo apt install fonts-noto-cjk        # 或 fonts-wqy-microhei
+```
+
 ## 用 rqt_robot_steering 遥控
 
 `sim.launch.py` 已经启动了一个配置好的 `rqt_robot_steering` 窗口，直接拖动
 **Linear x**（前进/后退）和 **Angular z**（左转/右转）滑块即可。前进速度
-范围 0–10 m/s（36 km/h），倒车 0–4 m/s，转向 ±2 rad/s。松开滑块前小车会
+范围 0–12 m/s（43 km/h），倒车 0–4 m/s，转向 ±3 rad/s。松开滑块前小车会
 持续按当前速度行驶，把滑块拖回 0 或点击 **Stop** 停车。
 
 也可以单独启动遥控窗口（仿真已经在运行时）：
@@ -93,7 +127,7 @@ Gazebo 的 DiffDrive 插件订阅 `/cmd_vel`，消息类型是
 同时它使用 `scripts/rqt_robot_steering_guardrail` 启动 rqt：
 rqt_robot_steering 1.0.3 在 PyQt5 下把浮点数传给 `QSlider.setMaximum()`，
 会抛 `TypeError`，导致速度上限设置失效、滑块始终只有 ±1 m/s。包装脚本把
-该值转成整数，滑块才能使用 0–10 m/s 的速度范围。
+该值转成整数，滑块才能使用 0–12 m/s 的速度范围。
 
 如果不想通过 launch 文件启动，也可以直接运行包装脚本：
 
@@ -109,7 +143,7 @@ ros2 run guardrail_robot rqt_robot_steering_guardrail
 ### 速度参数
 
 * Gazebo 侧上限：`urdf/gazebo.xacro` 中的 `max_linear_velocity`
-  （当前 10 m/s）、`max_linear_acceleration`（3 m/s²）。
+  （当前 12 m/s）、`max_linear_acceleration`（8 m/s²）。
 * rqt 滑块范围：`config/rqt_robot_steering.ini` 中的 `vx_max` / `vx_min`。
 
 ## 话题说明

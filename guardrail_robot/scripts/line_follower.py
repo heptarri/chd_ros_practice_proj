@@ -6,6 +6,9 @@ edge line and publishes geometry_msgs/Twist on /cmd_vel.  The car is kept at a
 fixed lateral distance from that line (default: 1.775 m, i.e. the centre of
 the right lane), so it follows the lane through the bend.
 
+The detection / control code lives in ``line_following.py`` so that both this
+headless node and the PyQt GUI (``guardrail_gui.py``) share the same logic.
+
 Usage:
     ros2 run guardrail_robot line_follower.py
     ros2 run guardrail_robot line_follower.py --ros-args -p speed:=2.0
@@ -15,12 +18,11 @@ The optional debug image is published on /line_follower/debug and can be
 viewed with rqt_image_view.
 """
 
-import math
+import os
 import signal
+import sys
 import time
 
-import cv2
-import numpy as np
 import rclpy
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Twist
@@ -29,148 +31,8 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Image
 
-
-def default_config():
-    """Default parameters, also used as ROS parameter defaults."""
-    return {
-        # Camera model (must match urdf/sensors.xacro).
-        'hfov': 1.396263,
-        'camera_height': 0.80,
-        'camera_yaw': -0.08,
-        'camera_pitch': 0.0,
-        # Detection region: right part of the image, below the horizon.
-        'roi_x_min': 0.45,
-        'roi_y_min': 0.60,
-        'roi_y_max': 0.95,
-        'white_v_min': 150,
-        'white_s_max': 70,
-        'min_pixels': 120,
-        # Control.
-        'look_ratio': 0.72,
-        'target_offset': -1.775,
-        'kp': 0.9,
-        'max_angular': 1.0,
-        'speed': 7,
-        'min_speed': 0.5,
-        'error_slow': 1.5,
-        # Topics / behaviour.
-        'image_topic': '/camera/image_raw',
-        'cmd_topic': '/cmd_vel',
-        'lost_timeout': 0.6,
-        'debug': False,
-    }
-
-
-def detect_and_steer(frame_bgr, cfg):
-    """Detect the right edge line and compute a Twist command.
-
-    Returns a dict with v, w, error, lateral, x, row, slope, mask and an
-    optional debug overlay, or None when no trustworthy line was found.
-    """
-    h, w = frame_bgr.shape[:2]
-    if h < 32 or w < 32:
-        return None
-
-    focal = (w * 0.5) / math.tan(cfg['hfov'] * 0.5)
-    cx, cy = w * 0.5, h * 0.5
-
-    x0 = int(w * cfg['roi_x_min'])
-    x1 = w
-    y0 = int(h * cfg['roi_y_min'])
-    y1 = int(h * cfg['roi_y_max'])
-    y0 = max(0, min(h - 2, y0))
-    y1 = max(y0 + 1, min(h, y1))
-
-    roi = np.zeros((h, w), dtype=np.uint8)
-    roi[y0:y1, x0:x1] = 255
-
-    hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
-    white = cv2.inRange(
-        hsv,
-        (0, 0, int(cfg['white_v_min'])),
-        (180, int(cfg['white_s_max']), 255),
-    )
-    mask = cv2.bitwise_and(white, roi)
-
-    if int(cv2.countNonZero(mask)) < cfg['min_pixels']:
-        return None
-
-    ys, xs = np.nonzero(mask)
-    if ys.size < cfg['min_pixels']:
-        return None
-
-    # x as a function of y (the right edge line is strongly slanted).
-    try:
-        slope, intercept = np.polyfit(ys, xs, 1)
-    except (np.linalg.LinAlgError, ValueError):
-        return None
-
-    # Drop stray bright pixels and fit once more.
-    residual = np.abs(xs - (slope * ys + intercept))
-    keep = residual <= max(12.0, 0.03 * w)
-    if int(keep.sum()) >= cfg['min_pixels']:
-        try:
-            slope, intercept = np.polyfit(ys[keep], xs[keep], 1)
-        except (np.linalg.LinAlgError, ValueError):
-            return None
-
-    if not (0.05 <= slope <= 15.0):
-        return None
-
-    look_row = int(round(h * cfg['look_ratio']))
-    look_row = max(y0, min(y1 - 1, look_row))
-    x_look = slope * look_row + intercept
-    if not (0.0 <= x_look < w):
-        return None
-
-    # Ground distance of the look-ahead row (flat road, level/pitched camera).
-    beta = math.atan2(look_row - cy, focal)
-    theta = beta + cfg['camera_pitch']
-    if theta <= 0.03:
-        return None
-    distance = cfg['camera_height'] / math.tan(theta)
-
-    # Lateral offset of the line in the car frame (+left, -right).
-    alpha = math.atan2(x_look - cx, focal)      # +right of the camera axis
-    line_angle = cfg['camera_yaw'] - alpha      # angle in the car frame
-    lateral = distance * math.tan(line_angle)
-
-    error = lateral - cfg['target_offset']
-    angular = cfg['kp'] * error
-    angular = max(-cfg['max_angular'], min(cfg['max_angular'], angular))
-
-    speed = cfg['speed'] - (cfg['speed'] - cfg['min_speed']) * min(
-        abs(error) / cfg['error_slow'], 1.0)
-    speed = max(cfg['min_speed'], speed)
-
-    overlay = None
-    if cfg['debug']:
-        overlay = frame_bgr.copy()
-        cv2.rectangle(overlay, (x0, y0), (x1 - 1, y1 - 1), (0, 255, 0), 1)
-        overlay[mask > 0] = (0, 255, 0)
-        xa = int(slope * y0 + intercept)
-        xb = int(slope * (y1 - 1) + intercept)
-        cv2.line(overlay, (xa, y0), (xb, y1 - 1), (255, 0, 0), 2)
-        cv2.line(overlay, (0, look_row), (w - 1, look_row), (0, 0, 255), 1)
-        cv2.circle(overlay, (int(x_look), look_row), 5, (0, 0, 255), -1)
-        text = (f'lateral={lateral:+.2f}m err={error:+.2f}m '
-                f'v={speed:.1f} w={angular:+.2f}')
-        cv2.putText(overlay, text, (10, 26), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.60, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(overlay, text, (10, 26), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.60, (0, 0, 0), 1, cv2.LINE_AA)
-
-    return {
-        'v': float(speed),
-        'w': float(angular),
-        'error': float(error),
-        'lateral': float(lateral),
-        'x': float(x_look),
-        'row': int(look_row),
-        'slope': float(slope),
-        'mask': mask,
-        'overlay': overlay,
-    }
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from line_following import default_config, detect_and_steer
 
 
 class LineFollower(Node):

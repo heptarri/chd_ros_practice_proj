@@ -31,17 +31,18 @@
       <child_frame_id>base_footprint</child_frame_id>
       <odom_publish_frequency>50</odom_publish_frequency>
 
-      <!-- Road-inspection vehicle limits: up to 10 m/s (36 km/h) and
-           3 m/s^2 acceleration, i.e. quick enough to drive normally on
-           the 120 m highway section while staying controllable. -->
+      <!-- Road-inspection vehicle limits: up to 12 m/s (43 km/h), with
+           snappy acceleration / braking (8-10 m/s^2) so the car reacts
+           quickly to speed and steering commands instead of slowly
+           ramping up. -->
       <min_linear_velocity>-4.0</min_linear_velocity>
-      <max_linear_velocity>10.0</max_linear_velocity>
-      <min_angular_velocity>-2.0</min_angular_velocity>
-      <max_angular_velocity>2.0</max_angular_velocity>
-      <min_linear_acceleration>-5.0</min_linear_acceleration>
-      <max_linear_acceleration>3.0</max_linear_acceleration>
-      <min_angular_acceleration>-3.0</min_angular_acceleration>
-      <max_angular_acceleration>3.0</max_angular_acceleration>
+      <max_linear_velocity>12.0</max_linear_velocity>
+      <min_angular_velocity>-3.0</min_angular_velocity>
+      <max_angular_velocity>3.0</max_angular_velocity>
+      <min_linear_acceleration>-10.0</min_linear_acceleration>
+      <max_linear_acceleration>8.0</max_linear_acceleration>
+      <min_angular_acceleration>-10.0</min_angular_acceleration>
+      <max_angular_acceleration>10.0</max_angular_acceleration>
     </plugin>
 
     <!-- Publishes /joint_states as gz.msgs.Model; bridge it to

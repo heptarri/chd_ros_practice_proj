@@ -15,6 +15,8 @@ install(DIRECTORY
 install(PROGRAMS
   scripts/rqt_robot_steering_guardrail
   scripts/line_follower.py
+  scripts/line_following.py
+  scripts/guardrail_gui.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -1,0 +1,405 @@
+#!/usr/bin/env python3
+"""PyQt5 control panel for the guardrail_robot simulation.
+
+The window shows the front camera feed on the left and, on the right, a mode
+selector (line following vs. manual driving) plus an rqt_robot_steering-style
+joystick made of two vertical sliders (``Linear x`` and ``Angular z``).
+
+Modes
+-----
+* Manual: the two sliders publish ``geometry_msgs/msg/Twist`` on ``/cmd_vel``.
+* Line following: the same detection / control code as ``line_follower.py``
+  (imported from ``line_following.py``) drives the robot from the camera.
+
+The ``/cmd_vel`` commands are published at a steady rate by a QTimer, and the
+ROS executor is pumped from the Qt event loop, so no extra thread is needed.
+
+Usage:
+    ros2 run guardrail_robot guardrail_gui
+    ros2 run guardrail_robot guardrail_gui --ros-args -p speed:=2.0
+"""
+
+import os
+import signal
+import sys
+import time
+
+import rclpy
+from cv_bridge import CvBridge
+from geometry_msgs.msg import Twist
+from rclpy.executors import SingleThreadedExecutor
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import Image
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from line_following import default_config, detect_and_steer
+
+
+class CameraView(QtWidgets.QLabel):
+    """Label that displays the (BGR) camera frame, scaled to fit."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumSize(640, 360)
+        self.setAlignment(QtCore.Qt.AlignCenter)
+        self.setStyleSheet('background-color: #101418; color: #8b96a5;')
+        self.setText('等待摄像头画面…')
+        self._image = None
+
+    def set_image(self, qimage):
+        self._image = qimage
+        self.setText('')
+        self._refresh()
+
+    def _refresh(self):
+        if self._image is None:
+            return
+        pixmap = QtGui.QPixmap.fromImage(self._image).scaled(
+            self.size(), QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation)
+        self.setPixmap(pixmap)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._refresh()
+
+
+class SteeringJoystick(QtWidgets.QWidget):
+    """Two vertical sliders, matching rqt_robot_steering's steering widget.
+
+    ``Linear x`` goes from ``vx_min`` to ``vx_max`` (up = forward) and
+    ``Angular z`` from ``vw_min`` to ``vw_max`` (up = left turn).
+    """
+
+    value_changed = QtCore.pyqtSignal(float, float)
+
+    SLIDER_RANGE = 1000  # integer slider resolution
+
+    def __init__(self, vx_min=-4.0, vx_max=12.0, vw_min=-3.0, vw_max=3.0,
+                 parent=None):
+        super().__init__(parent)
+        self._limits = {
+            'linear': (float(vx_min), float(vx_max)),
+            'angular': (float(vw_min), float(vw_max)),
+        }
+        self._sliders = {}
+        self._value_labels = {}
+        self._build_ui()
+
+    def _build_ui(self):
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setContentsMargins(8, 4, 8, 4)
+        layout.setSpacing(24)
+        layout.addWidget(self._make_column('Linear x', 'linear', '前 +  /  后 −'))
+        layout.addWidget(self._make_column('Angular z', 'angular', '左 +  /  右 −'))
+
+    def _make_column(self, title, key, hint):
+        lo, hi = self._limits[key]
+
+        title_label = QtWidgets.QLabel(title)
+        title_label.setAlignment(QtCore.Qt.AlignHCenter)
+        font = title_label.font()
+        font.setBold(True)
+        title_label.setFont(font)
+
+        value_label = QtWidgets.QLabel('0.00')
+        value_label.setAlignment(QtCore.Qt.AlignHCenter)
+        value_label.setStyleSheet('font-family: monospace; font-size: 15px;')
+
+        slider = QtWidgets.QSlider(QtCore.Qt.Vertical)
+        slider.setRange(0, self.SLIDER_RANGE)
+        slider.setTickPosition(QtWidgets.QSlider.TicksBothSides)
+        slider.setTickInterval(100)
+        slider.setMinimumHeight(180)
+        slider.valueChanged.connect(
+            lambda value, k=key: self._on_slider(k))
+
+        hint_label = QtWidgets.QLabel(f'{hint}\n{lo:+.0f} … {hi:+.0f}')
+        hint_label.setAlignment(QtCore.Qt.AlignHCenter)
+        hint_label.setStyleSheet('color: #8b96a5;')
+
+        column = QtWidgets.QVBoxLayout()
+        column.setSpacing(4)
+        column.addWidget(title_label)
+        column.addWidget(value_label)
+        column.addWidget(slider, stretch=1)
+        column.addWidget(hint_label)
+
+        self._sliders[key] = slider
+        self._value_labels[key] = value_label
+        self.set_slider(key, 0.0)
+
+        widget = QtWidgets.QWidget()
+        widget.setLayout(column)
+        return widget
+
+    def _to_value(self, key, slider_value):
+        lo, hi = self._limits[key]
+        return lo + (slider_value / float(self.SLIDER_RANGE)) * (hi - lo)
+
+    def _to_slider(self, key, value):
+        lo, hi = self._limits[key]
+        return int(round((value - lo) / (hi - lo) * self.SLIDER_RANGE))
+
+    def set_slider(self, key, value):
+        slider = self._sliders[key]
+        slider.blockSignals(True)
+        slider.setValue(self._to_slider(key, value))
+        slider.blockSignals(False)
+        self._value_labels[key].setText(f'{value:+.2f}')
+
+    def _on_slider(self, key):
+        value = self._to_value(key, self._sliders[key].value())
+        self._value_labels[key].setText(f'{value:+.2f}')
+        self.value_changed.emit(self.linear(), self.angular())
+
+    def linear(self):
+        return self._to_value('linear', self._sliders['linear'].value())
+
+    def angular(self):
+        return self._to_value('angular', self._sliders['angular'].value())
+
+    def stop(self):
+        self.set_slider('linear', 0.0)
+        self.set_slider('angular', 0.0)
+
+
+class GuardrailWindow(QtWidgets.QMainWindow):
+
+    def __init__(self, node):
+        super().__init__()
+        self.node = node
+        self.cfg = self._read_params()
+        self.bridge = CvBridge()
+        self.twist = Twist()
+        self.last_image_time = 0.0
+        self.mode = 'manual'
+
+        self._build_ui()
+        self._build_ros()
+        self._build_timers()
+
+    # ------------------------------------------------------------------ ROS
+    def _read_params(self):
+        cfg = default_config()
+        for name, value in cfg.items():
+            self.node.declare_parameter(name, value)
+            cfg[name] = self.node.get_parameter(name).value
+        for name, value in (('vx_min', -4.0), ('vx_max', 12.0),
+                            ('vw_min', -3.0), ('vw_max', 3.0)):
+            self.node.declare_parameter(name, value)
+            cfg[name] = self.node.get_parameter(name).value
+        return cfg
+
+    def _build_ros(self):
+        self.image_sub = self.node.create_subscription(
+            Image, self.cfg['image_topic'], self._on_image,
+            qos_profile_sensor_data)
+        self.cmd_pub = self.node.create_publisher(
+            Twist, self.cfg['cmd_topic'], 10)
+
+    def _build_timers(self):
+        self.publish_timer = QtCore.QTimer(self)
+        self.publish_timer.timeout.connect(self._on_publish)
+        self.publish_timer.start(50)
+
+        self.status_timer = QtCore.QTimer(self)
+        self.status_timer.timeout.connect(self._on_status_tick)
+        self.status_timer.start(200)
+
+    # ------------------------------------------------------------------- UI
+    def _build_ui(self):
+        self.setWindowTitle('护栏巡检小车控制台 / Guardrail Robot Control')
+        self.resize(1120, 720)
+
+        central = QtWidgets.QWidget()
+        self.setCentralWidget(central)
+        root = QtWidgets.QHBoxLayout(central)
+        root.setContentsMargins(12, 12, 12, 12)
+        root.setSpacing(12)
+
+        # Left: camera feed.
+        camera_box = QtWidgets.QGroupBox('摄像头画面 / Camera')
+        camera_layout = QtWidgets.QVBoxLayout(camera_box)
+        self.camera = CameraView()
+        camera_layout.addWidget(self.camera)
+
+        # Right: mode + joystick + status.
+        mode_box = QtWidgets.QGroupBox('控制模式 / Mode')
+        mode_layout = QtWidgets.QVBoxLayout(mode_box)
+        self.rb_follow = QtWidgets.QRadioButton('寻迹 (line following)')
+        self.rb_manual = QtWidgets.QRadioButton('手动控制 (manual)')
+        self.rb_manual.setChecked(True)
+        self.mode_group = QtWidgets.QButtonGroup(self)
+        self.mode_group.addButton(self.rb_follow)
+        self.mode_group.addButton(self.rb_manual)
+        mode_layout.addWidget(self.rb_follow)
+        mode_layout.addWidget(self.rb_manual)
+
+        steer_box = QtWidgets.QGroupBox('手动摇杆 / Steering')
+        steer_layout = QtWidgets.QVBoxLayout(steer_box)
+        self.steering = SteeringJoystick(
+            self.cfg['vx_min'], self.cfg['vx_max'],
+            self.cfg['vw_min'], self.cfg['vw_max'])
+        steer_layout.addWidget(self.steering)
+        self.btn_stop = QtWidgets.QPushButton('急停 / Stop')
+        self.btn_stop.setMinimumHeight(36)
+        steer_layout.addWidget(self.btn_stop)
+
+        status_box = QtWidgets.QGroupBox('状态 / Status')
+        status_layout = QtWidgets.QVBoxLayout(status_box)
+        self.follow_status = QtWidgets.QLabel('手动控制模式：用摇杆控制车速与转向。')
+        self.follow_status.setWordWrap(True)
+        status_layout.addWidget(self.follow_status)
+
+        side = QtWidgets.QVBoxLayout()
+        side.setSpacing(12)
+        side.addWidget(mode_box)
+        side.addWidget(steer_box, stretch=1)
+        side.addWidget(status_box)
+
+        root.addWidget(camera_box, stretch=1)
+        root.addLayout(side)
+
+        self.statusBar().showMessage('就绪')
+
+        self.mode_group.buttonToggled.connect(self._on_mode_changed)
+        self.steering.value_changed.connect(self._on_manual)
+        self.btn_stop.clicked.connect(self._on_stop)
+
+    # ------------------------------------------------------------- callbacks
+    def _on_mode_changed(self, _button=None, _checked=None):
+        if self.rb_manual.isChecked():
+            self.mode = 'manual'
+            self.steering.setEnabled(True)
+            self.follow_status.setText('手动控制模式：用摇杆控制车速与转向。')
+            self._on_manual(self.steering.linear(), self.steering.angular())
+        else:
+            self.mode = 'line_follow'
+            self.steering.setEnabled(False)
+            self.twist = Twist()
+            self.follow_status.setText('寻迹模式：等待摄像头画面…')
+
+    def _on_manual(self, linear, angular):
+        if self.mode == 'manual':
+            self.twist.linear.x = linear
+            self.twist.angular.z = angular
+
+    def _on_stop(self):
+        self.steering.stop()
+        self.twist = Twist()
+        self.rb_manual.setChecked(True)  # also fires _on_mode_changed
+
+    def _on_image(self, msg):
+        self.last_image_time = time.monotonic()
+        try:
+            frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        except Exception as exc:  # cv_bridge raises CvBridgeError
+            self.node.get_logger().error(f'cv_bridge 转换失败: {exc}')
+            return
+
+        if self.mode == 'line_follow':
+            result = detect_and_steer(frame, self.cfg)
+            if result is None:
+                self.twist = Twist()
+                self.follow_status.setText('丢失车道线，已停车')
+            else:
+                self.twist.linear.x = result['v']
+                self.twist.angular.z = result['w']
+                self.follow_status.setText(
+                    f"寻迹中：横向偏移 {result['lateral']:+.2f} m，"
+                    f"误差 {result['error']:+.2f} m，"
+                    f"速度 {result['v']:.1f} m/s，"
+                    f"角速度 {result['w']:+.2f} rad/s")
+
+        h, w = frame.shape[:2]
+        image = QtGui.QImage(frame.data, w, h, frame.strides[0],
+                             QtGui.QImage.Format_BGR888).copy()
+        self.camera.set_image(image)
+
+    def _on_publish(self):
+        # Watchdog: stop if line following but the camera went silent.
+        if self.mode == 'line_follow' and self.last_image_time > 0.0:
+            if time.monotonic() - self.last_image_time > self.cfg['lost_timeout']:
+                self.twist = Twist()
+                self.follow_status.setText('摄像头无信号，已停车')
+        self.cmd_pub.publish(self.twist)
+
+    def _on_status_tick(self):
+        mode = '寻迹' if self.mode == 'line_follow' else '手动'
+        self.statusBar().showMessage(
+            f"模式 {mode}  |  image: {self.cfg['image_topic']}  |  "
+            f"cmd: {self.cfg['cmd_topic']}  |  "
+            f"v={self.twist.linear.x:+.2f} m/s  "
+            f"w={self.twist.angular.z:+.2f} rad/s")
+
+    # ------------------------------------------------------------- shutdown
+    def stop_robot(self):
+        if not rclpy.ok():
+            return
+        self.twist = Twist()
+        for _ in range(3):
+            try:
+                self.cmd_pub.publish(self.twist)
+            except Exception:
+                break
+            time.sleep(0.02)
+
+    def closeEvent(self, event):
+        self.stop_robot()
+        super().closeEvent(event)
+
+
+def _pick_cjk_font():
+    """Return the first installed font able to render simplified Chinese."""
+    wanted = [
+        'Noto Sans CJK SC', 'Noto Sans SC', 'Source Han Sans SC',
+        'WenQuanYi Micro Hei', 'WenQuanYi Zen Hei', 'PingFang SC',
+        'Microsoft YaHei', 'SimHei',
+    ]
+    families = set(QtGui.QFontDatabase().families())
+    for name in wanted:
+        if name in families:
+            return name
+    return None
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = Node('guardrail_gui')
+
+    app = QtWidgets.QApplication(sys.argv)
+    cjk_font = _pick_cjk_font()
+    if cjk_font:
+        app.setFont(QtGui.QFont(cjk_font, 10))
+
+    window = GuardrailWindow(node)
+    window.show()
+
+    executor = SingleThreadedExecutor()
+    executor.add_node(node)
+    spin_timer = QtCore.QTimer()
+    spin_timer.timeout.connect(lambda: executor.spin_once(timeout_sec=0))
+    spin_timer.start(20)
+
+    # Ctrl+C / SIGTERM should close the Qt window cleanly.
+    def _quit(*_args):
+        QtWidgets.QApplication.instance().quit()
+
+    signal.signal(signal.SIGINT, _quit)
+    signal.signal(signal.SIGTERM, _quit)
+
+    try:
+        app.exec_()
+    finally:
+        spin_timer.stop()
+        window.stop_robot()
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
