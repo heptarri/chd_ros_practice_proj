@@ -5,7 +5,7 @@ ROS 2 Humble + Gazebo（Fortress / ignition-gazebo6）中的护栏巡检小车�
 ## 尺寸
 
 小车按真实中型乘用车/高速公路巡检车尺寸建模，公路按实际两车道高速断面建模，
-并做成半径 120 m、约 57° 的左弯：
+并做成半径 120 m、约 86° 的左弯：
 
 | 项目 | 数值 |
 | --- | --- |
@@ -18,9 +18,22 @@ ROS 2 Humble + Gazebo（Fortress / ignition-gazebo6）中的护栏巡检小车�
 | 相机 / 激光雷达离地高度 | 0.80 m / 1.70 m |
 | 车道宽 | 3.75 m |
 | 右侧硬路肩 | 2.50 m |
-| 公路长度 / 弯道半径 / 转角 | 120 m / 120 m / 约 57°（左弯） |
+| 公路长度 / 弯道半径 / 转角 | 180 m / 120 m / 约 86°（左弯） |
 | 中央虚线 | 6 m 线段 + 9 m 间隔 |
 | 护栏梁高 / 立柱间距 | 0.31 m / 4 m |
+
+## 修改赛道
+
+`worlds/highway.sdf` 由 `tools/generate_highway.py` 生成。要改变长度或弯曲程度，
+编辑脚本顶部的 `R`（弯道半径）、`S_START` / `S_END`（起止弧长），然后重新生成并编译：
+
+```bash
+python3 src/guardrail_robot/tools/generate_highway.py
+colcon build --packages-select guardrail_robot
+source install/setup.bash
+```
+
+当前配置为半径 120 m、总长 180 m（约 86° 左弯）。地图上不再放置交通锥桶/施工桶。
 
 ## 编译
 
